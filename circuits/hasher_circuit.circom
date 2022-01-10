@@ -1,4 +1,4 @@
-//import "mimcsponge.circom";
+include "mimcsponge.circom";
 
 /*  
 Hash a board (list) of n numbers, salted with a nonce
@@ -21,12 +21,12 @@ template BoardHasher(n) {
     mimc.ins[0] <== nonce;
 
     for (var i=0; i<n; i++) {
-        mims.ins[i+1] <== board[i];
+        mimc.ins[i+1] <== board[i];
     }
     mimc.k <== 0;
 
 
-    out <== mims.outs[0];
+    out <== mimc.outs[0];
 }
 
 component main = BoardHasher(25);
