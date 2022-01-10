@@ -80,25 +80,25 @@ function renderTable(array, width) {
   return <>{result}</>
 }
 
-function makeBoard(width, height) {
-  let result = [];
+// function makeBoard(width, height) {
+//   let result = [];
 
-  for (let i = 0; i < width * height; i++) {
-    result.push(false);
-  }
+//   for (let i = 0; i < width * height; i++) {
+//     result.push(false);
+//   }
 
-  return result;
-}
+//   return result;
+// }
 
-export function Board() {
-  const [boardState, setBoardState] = useState(makeBoard(5, 5))
+export function Board(props) {
+  // const [boardState, setBoardState] = useState(makeBoard(5, 5))
 
   const setCellValue = (i, value) => {
-    boardState[i] = value
-    setBoardState([...boardState])
+    props.boardState[i] = value
+    props.setBoardState([...props.boardState])
   }
 
-  const renderedCells = boardState.map((s, i) => <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue}/>)
+  const renderedCells = props.boardState.map((s, i) => <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue}/>)
 
   return <div>{renderTable(renderedCells, 5)}</div>
 }

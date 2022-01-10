@@ -1,4 +1,5 @@
 import { Board } from "./Board";
+import { useState } from 'react';
 
 /**
  * This is the root of the application.
@@ -18,15 +19,27 @@ export function App() {
     const res = await snarkjs.groth16.verify(vkey, publicSignals, proof);
     console.log(res);
   }
-  
+
+  const [boardState, setBoardState] = useState(makeBoard(5, 5))
+  console.log(boardState)
   return (
     <div>
       <button
         onClick={calculateProof}
       >Click me!</button>
-      <Board/>
+      <Board boardState={boardState} setBoardState={setBoardState}/>
     </div>
   );
+}
+
+function makeBoard(width, height) {
+  let result = [];
+
+  for (let i = 0; i < width * height; i++) {
+    result.push(false);
+  }
+
+  return result;
 }
 
 console.log()
