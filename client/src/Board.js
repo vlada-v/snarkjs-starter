@@ -73,7 +73,7 @@ function renderTable(array, width) {
   for (let i = 0; i < array.length; i++) {
     result.push(array[i]);
     if ((i + 1) % width === 0) {
-      result.push(<br />)
+      result.push(<br key = {"br" + i}/>)
     }
   }
 

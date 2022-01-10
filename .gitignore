@@ -5,3 +5,5 @@ circuits
 !circuits/circuit.circom
 !circuits/hasher_circuit.circom
 !circuits/multiplexer.circom
+*.sym
+*.json
