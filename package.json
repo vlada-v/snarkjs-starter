@@ -1,10 +1,11 @@
 {
   "name": "snarkjs-starter",
   "version": "1.0.0",
-  "main": "index.js",
+  "source": "client/src/index.html",
   "license": "MIT",
   "scripts": {
-    "start": "parcel client/src/index.html"
+    "start": "npx parcel",
+    "build": "npx parcel build"
   },
   "dependencies": {
     "circom": "^0.5.45",
