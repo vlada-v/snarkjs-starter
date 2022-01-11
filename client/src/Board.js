@@ -1,4 +1,4 @@
-import React, { useState ,useCallback} from 'react';
+import React, { useState, useCallback } from "react";
 
 // function Cell(props) {
 //   console.log(props.colorBackground)
@@ -55,15 +55,20 @@ import React, { useState ,useCallback} from 'react';
 function Cell(props) {
   const flip = () => {
     console.log(props);
-    props.setCellValue(props.cellIndex, !props.value)
-  }
+    props.setCellValue(props.cellIndex, !props.value);
+  };
 
-  return <div style={{
-    display: "inline-block",
-    width: "25px",
-    height: "25px",
-    backgroundColor: props.value? "red" : "blue"
-  }}onClick={flip}></div>
+  return (
+    <div
+      style={{
+        display: "inline-block",
+        width: "25px",
+        height: "25px",
+        backgroundColor: props.value ? "red" : "blue",
+      }}
+      onClick={flip}
+    ></div>
+  );
 }
 
 function renderTable(array, width) {
@@ -73,11 +78,11 @@ function renderTable(array, width) {
   for (let i = 0; i < array.length; i++) {
     result.push(array[i]);
     if ((i + 1) % width === 0) {
-      result.push(<br key = {"br" + i}/>)
+      result.push(<br key={"br" + i} />);
     }
   }
 
-  return <>{result}</>
+  return <>{result}</>;
 }
 
 // function makeBoard(width, height) {
@@ -94,11 +99,13 @@ export function Board(props) {
   // const [boardState, setBoardState] = useState(makeBoard(5, 5))
 
   const setCellValue = (i, value) => {
-    props.boardState[i] = value
-    props.setBoardState([...props.boardState])
-  }
+    props.boardState[i] = value;
+    props.setBoardState([...props.boardState]);
+  };
 
-  const renderedCells = props.boardState.map((s, i) => <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue}/>)
+  const renderedCells = props.boardState.map((s, i) => (
+    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} />
+  ));
 
-  return <div>{renderTable(renderedCells, 5)}</div>
+  return <div>{renderTable(renderedCells, 5)}</div>;
 }
