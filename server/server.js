@@ -6,10 +6,11 @@ const bodyParser = require('body-parser')
 let cnt = 0
 let board = [false];
 // A boardhash is {player: a, boardhash: b, proof: c} where c proves that the board belonging to b is legal
-let boardhashes = {};
-// A move initially is {player: a, field: b} and after an answer arrives from player a it becomes
-// {player: a, field: b, answer: c, proof: d}
-let moves = {};
+let boardhashes = [];
+// A move initially is {player: a, field: b} 
+let moves = [];
+// After an answer arrives from player a to a move, {player: a, field: b, answer: c, proof: d} is stored here
+let answers = [];
 
 // Post board with userid  (/post-board/:userid)     (body: ZK Proof of hash of board)
 // Query cell        (/query-cell/:userid/:cell)
@@ -29,13 +30,24 @@ app.get('/', (req, res) => {
 app.post('/post-board-hash/:userid', function (req, res) {
     try {
         let player = req.params.userid;
-        boardhashes[player] = req.body.boardhash;
+        boardhashes.push({"player": player, "boardhash": req.body.boardhash, "proof": req.body.proof});
         console.log(boardhashes);
         res.send({"success": true});
     } catch (e) {
         console.log(e);
         res.send({"success": false});
     }
+})
+
+app.get('/post-move/:userid/:field', function (req, res) {
+    console.log("a");
+    moves.push({"player": req.params.userid, "field": req.params.field});
+    res.send({"success": true});
+})
+
+app.post('/answer-query/:userid/:field', function (req, res) {
+    answers.push({"player": req.params.userid, "field": req.params.field, "answer": req.body.value, "proof": req.body.proof});
+    res.send({"success": true});
 })
 
 app.get('/get-board-hash/:userid', function (req, res) {
@@ -60,6 +72,11 @@ app.get('/get-board', function (req, res) {
     console.log(board);
     res.send({"board": board});
 })
+
+app.get('/get-game-state', function (req, res) {
+    res.send({"boardhashes": boardhashes, "moves": moves, "answers": answers});
+})
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

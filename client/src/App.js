@@ -23,7 +23,13 @@ export function App() {
 
   const [boardState, setBoardState] = useState(makeBoard(5, 5));
   const [textState, setTextState] = useState("");
-  console.log(boardState);
+
+  
+  const [boardHashesState, setBoardHashesState] = useState([]);
+  const [movesState, setMovesState] = useState([]);
+  const [answersState, setAnswersState] = useState([]);
+
+  //console.log(boardState);
   const url = "http://localhost:3000";
 
   const sendBoard = () => {
@@ -45,6 +51,9 @@ export function App() {
   };
 
   const loadBoard = () => {
+    /*console.log(movesState);
+    console.log(boardHashesState);
+    console.log(answersState);*/
     setTextState("Loading board...");
     fetch(url + "/get-board",
     {
@@ -62,9 +71,29 @@ export function App() {
       });
   };
 
+  const loadState = () => {
+    fetch(url + "/get-game-state",
+    {
+      method: "GET",
+      mode: "cors" // no-cors, cors, *same-origin
+    })
+      .then(response => response.json())
+      .then(data => { 
+        console.log(data.moves);
+        setBoardHashesState(data.boardhashes);
+        setMovesState(data.moves);
+        setAnswersState(data.answers);
+        
+      })
+      .catch(error => {
+        
+        console.log({ error: error });
+      });
+  }
+
   useEffect(() =>{
-      setInterval(loadBoard,5000);
-    }, [])
+    setInterval(loadState,5000);
+  }, [])
 
   return (
     <div>
@@ -89,5 +118,3 @@ function makeBoard(width, height) {
 
   return result;
 }
-
-console.log()
