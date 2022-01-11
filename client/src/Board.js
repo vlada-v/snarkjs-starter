@@ -63,7 +63,7 @@ function Cell(props) {
     width: "25px",
     height: "25px",
     backgroundColor: props.value? "red" : "blue"
-  }}onClick={flip}>x</div>
+  }}onClick={flip}></div>
 }
 
 function renderTable(array, width) {

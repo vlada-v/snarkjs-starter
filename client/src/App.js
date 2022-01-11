@@ -1,5 +1,5 @@
 import { Board } from "./Board";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * This is the root of the application.
@@ -62,6 +62,9 @@ export function App() {
       });
   };
 
+  useEffect(() =>{
+      setInterval(loadBoard,5000);
+    }, [])
 
   return (
     <div>
