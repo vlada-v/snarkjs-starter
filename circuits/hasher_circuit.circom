@@ -9,10 +9,11 @@ template BoardHasher(n) {
     signal private input board[n];
     signal private input nonce;
 
-    signal output out;
+    signal output out_hash;
+
 
     // Check that every number on the board is 0 or 1
-    for (var i=0; i<n; i++) {
+    for (var i = 0; i < n; i++) {
         board[i] === board[i]*board[i];
     }
     
@@ -20,13 +21,13 @@ template BoardHasher(n) {
 
     mimc.ins[0] <== nonce;
 
-    for (var i=0; i<n; i++) {
+    for (var i = 0; i < n; i++) {
         mimc.ins[i+1] <== board[i];
     }
     mimc.k <== 0;
 
 
-    out <== mimc.outs[0];
+    out_hash <== mimc.outs[0];
 }
 
 component main = BoardHasher(25);

@@ -19,15 +19,58 @@ export function App() {
     const res = await snarkjs.groth16.verify(vkey, publicSignals, proof);
     console.log(res);
   }
+  
 
-  const [boardState, setBoardState] = useState(makeBoard(5, 5))
-  console.log(boardState)
+  const [boardState, setBoardState] = useState(makeBoard(5, 5));
+  const [textState, setTextState] = useState("");
+  console.log(boardState);
+  const url = "http://localhost:8000";
+
+  const sendBoard = () => {
+    setTextState("Sending board...");
+    fetch(url, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify(boardState)
+    })
+      .then(response => {
+        if(response.status == 200) {
+          setTextState("Board sent successfully");          
+        } else {
+          setTextState("Sending board failed");
+        }
+      }).catch(error => {setTextState("Sending board failed");});
+  };
+
+  const loadBoard = () => {
+    setTextState("Loading board...");
+    fetch(url,
+    {
+      mode: "cors" // no-cors, cors, *same-origin
+    })
+      .then(response => response.json())
+      .then(data => {
+        setTextState(JSON.stringify(data));
+      })
+      .catch(error => {
+        setTextState("Loading board failed");
+        console.log({ error: error });
+      });
+  };
+
+
   return (
     <div>
       <button
-        onClick={calculateProof}
-      >Click me!</button>
+        onClick={sendBoard}
+      >Send board</button>
+      <button
+        onClick={loadBoard}
+      >Load board</button>
       <Board boardState={boardState} setBoardState={setBoardState}/>
+      <div>{textState}</div>
     </div>
   );
 }
