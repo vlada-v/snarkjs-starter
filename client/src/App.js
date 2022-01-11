@@ -24,16 +24,16 @@ export function App() {
   const [boardState, setBoardState] = useState(makeBoard(5, 5));
   const [textState, setTextState] = useState("");
   console.log(boardState);
-  const url = "http://localhost:8000";
+  const url = "http://localhost:3000";
 
   const sendBoard = () => {
     setTextState("Sending board...");
-    fetch(url, {
+    fetch(url + "/post-board", {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
       },
-      body: JSON.stringify(boardState)
+      body: JSON.stringify({"board": boardState})
     })
       .then(response => {
         if(response.status == 200) {
@@ -46,13 +46,15 @@ export function App() {
 
   const loadBoard = () => {
     setTextState("Loading board...");
-    fetch(url,
+    fetch(url + "/get-board",
     {
+      method: "GET",
       mode: "cors" // no-cors, cors, *same-origin
     })
       .then(response => response.json())
-      .then(data => {
-        setTextState(JSON.stringify(data));
+      .then(data => { console.log(data);
+        setTextState("Board loaded successfully");
+        setBoardState(data.board);
       })
       .catch(error => {
         setTextState("Loading board failed");
