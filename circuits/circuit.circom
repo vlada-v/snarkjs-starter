@@ -8,8 +8,7 @@ The output is a hash commitment which corresponds to the board.
 
 template BoardHasher(n) {
     signal private input board[n];
-    //signal private input nonce;
-  //  signal public input boardhash;
+    signal private input nonce;
     signal input field;
 
     signal output out_field;
@@ -20,16 +19,14 @@ template BoardHasher(n) {
         multiplexer.inp[i][0] <== board[i];
     }
     multiplexer.sel <== field;
-    multiplexer.out[0] ==> out_field;
+    out_field <== multiplexer.out[0];
 
-    // Check that every number on the board is 0 or 1
-    for (var i=0; i<n; i++) {
-        board[i] === board[i]*board[i];
-    }
+    // There is no need to check for validity of the board, as it has been proved before
+    // And the hash proves that the board hasn't changed, so it's still a legal setup
     
-    component mimc = MiMCSponge(n,220,1);
+    component mimc = MiMCSponge(n+1,220,1);
 
-   // mimc.ins[0] <== nonce;
+    mimc.ins[0] <== nonce;
 
     for (var i=0; i<n; i++) {
         mimc.ins[i+1] <== board[i];
@@ -38,7 +35,7 @@ template BoardHasher(n) {
 
 
     out_hash <== mimc.outs[0];
-   // boardhash === out;
+
 }
 
 component main = BoardHasher(25);
