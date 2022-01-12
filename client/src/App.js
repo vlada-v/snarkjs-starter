@@ -19,6 +19,9 @@ export function App() {
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
   const [opponentBoardState, setOpponentBoardState] = useState(makeBoard(5, 5));
 
+  const [boardSent, setBoardSent] = useState(false);
+  const [opponentBoardHash, setOpponentBoardHash] = useState(0);
+
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);
   const [answersState, setAnswersState] = useState([]);
@@ -27,6 +30,11 @@ export function App() {
   const url = "http://localhost:3000";
 
   const sendBoard = () => {
+    if (playerIdState == "") {
+      setTextState("Specify a user id");
+      return;
+    }
+    setBoardSent(true);
     setTextState("Sending board...");
     const boardHash = 123;
     const proof = 345;
@@ -43,10 +51,12 @@ export function App() {
             if (response.status == 200) {
               setTextState("Board sent successfully");
             } else {
+              setBoardSent(false);
               setTextState("Sending board failed");
             }
           })
           .catch((error) => {
+            setBoardSent(false);
             setTextState("Sending board failed");
           });
       }
@@ -61,14 +71,20 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        data = {answers: [{field: 2, answer: true}, {field: 13, answer: true}, {field: 24, answer: false}]}
+        data = {
+          answers: [
+            { field: 2, answer: true },
+            { field: 13, answer: true },
+            { field: 24, answer: false },
+          ],
+        };
         console.log(data);
         setTextState("Updated successfully");
         const board = new Array(25).fill(null);
-        for (let i = 0; i < data.answers.length; i++){
-          board[data.answers[i].field] = data.answers[i].answer
+        for (let i = 0; i < data.answers.length; i++) {
+          board[data.answers[i].field] = data.answers[i].answer;
         }
-        console.log(board)
+        console.log(board);
         setOpponentBoardState(board);
       })
       .catch((error) => {
@@ -132,6 +148,7 @@ export function App() {
         proofValidity.then((res) => {
           console.log(res);
           if (res) {
+            setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
           } else {
             setTextState("Opponent's board is illegal");
@@ -149,36 +166,56 @@ export function App() {
 
   return (
     <div>
-      <div>
-        <input
-          type="text"
-          id="player-id"
-          placeholder="Your Player ID"
-          value={playerIdState}
-          onChange={(event) => setPlayerIdState(event.target.value)}
-        />
-      </div>
-      <div>
-        <input
-          type="text"
-          id="opponent-id"
-          placeholder="Opponent's Player ID"
-          value={opponentIdState}
-          onChange={(event) => setOpponentIdState(event.target.value)}
-        />
-      </div>
+      {!boardSent ? (
+        <div>
+          <input
+            type="text"
+            id="player-id"
+            placeholder="Your Player ID"
+            value={playerIdState}
+            onChange={(event) => setPlayerIdState(event.target.value)}
+          />
+        </div>
+      ) : null}
+      {opponentBoardHash == 0 ? (
+        <div>
+          <input
+            type="text"
+            id="opponent-id"
+            placeholder="Opponent's Player ID"
+            value={opponentIdState}
+            onChange={(event) => setOpponentIdState(event.target.value)}
+          />
+        </div>
+      ) : null}
 
-      <Board boardState={boardState} setBoardState={setBoardState}/>
-      <button onClick={sendBoard}>Send initial board</button>
-      <div>
-        <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
-      </div>
+      <Board
+        boardState={boardState}
+        setBoardState={!boardSent ? setBoardState : (x) => null}
+        isOpponent={false}
+      />
+      {!boardSent ? (
+        <button onClick={sendBoard}>Send initial board</button>
+      ) : null}
+      {opponentBoardHash == 0 ? (
+        <div>
+          <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
+        </div>
+      ) : null}
       <div>{textState}</div>
       <div>{JSON.stringify(boardHashesState)}</div>
       <div>{JSON.stringify(movesState)}</div>
       <div>{JSON.stringify(answersState)}</div>
-      <div>Your Opponent's Board:</div>
-      <Board boardState={opponentBoardState} setBoardState={constructBoardWithGuesses}/>
+
+      {opponentBoardHash != 0 ? (
+        <div>
+          <div>Your Opponent's Board:</div>
+          <Board
+            boardState={opponentBoardState}
+            setBoardState={constructBoardWithGuesses}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
