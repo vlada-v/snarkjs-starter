@@ -12,12 +12,12 @@ function generateRandomNumber() {
  * This is the root of the application.
  */
 export function App() {
-  const [boardState, setBoardState] = useState(makeBoard(5, 5));
+  const [boardState, setBoardState] = useState(makeBoard(5, 5, false));
   const [textState, setTextState] = useState("");
   const [playerIdState, setPlayerIdState] = useState("");
   const [opponentIdState, setOpponentIdState] = useState("");
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
-  const [opponentBoardState, setOpponentBoardState] = useState(makeBoard(5, 5));
+  const [opponentBoardState, setOpponentBoardState] = useState(makeBoard(5, 5, null));
 
   const [boardSent, setBoardSent] = useState(false);
   const [opponentBoardHash, setOpponentBoardHash] = useState(0);
@@ -40,6 +40,7 @@ export function App() {
     const proof = 345;
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
+        // console.log(boardHashProof, JSON.stringify(boardHashProof))
         fetch(url + "/post-board-hash/" + playerIdState, {
           method: "POST",
           headers: {
@@ -58,6 +59,33 @@ export function App() {
           .catch((error) => {
             setBoardSent(false);
             setTextState("Sending board failed");
+          });
+      }
+    );
+  };
+
+  const answerQuery = (fieldId) => {
+    setTextState("Answering query...");
+    const boardHash = 123;
+    const proof = 345;
+    Circuit.proveBoardAnswer(boardState, boardSaltState, fieldId).then(
+      (proofValue) => {
+        fetch(url + "/answer-query/" + playerIdState + fieldId, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(proofValue),
+        })
+          .then((response) => {
+            if (response.status == 200) {
+              setTextState("Answer sent successfully" + proofValue.value);
+            } else {
+              setTextState("Sending answer failed");
+            }
+          })
+          .catch((error) => {
+            setTextState("Sending answer failed");
           });
       }
     );
@@ -220,11 +248,11 @@ export function App() {
   );
 }
 
-function makeBoard(width, height) {
+function makeBoard(width, height, defaultValue) {
   let result = [];
 
   for (let i = 0; i < width * height; i++) {
-    result.push(false);
+    result.push(defaultValue);
   }
 
   return result;

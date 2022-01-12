@@ -3,7 +3,12 @@ import React, { useState, useCallback } from "react";
 function Cell(props) {
   const flip = () => {
     console.log(props);
-    props.setCellValue(props.cellIndex, !props.value);
+    if (props.value != null){
+      props.setCellValue(props.cellIndex, !props.value);
+    }
+    else {
+      
+    }
   };
 
   return (
