@@ -64,7 +64,10 @@ function Cell(props) {
         display: "inline-block",
         width: "25px",
         height: "25px",
-        backgroundColor: props.value ? "red" : "blue",
+        borderColor: 'black',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        backgroundColor: props.isOpponent ? 'gray' : (props.value ? "red" : "blue"),
       }}
       onClick={flip}
     ></div>
@@ -102,9 +105,10 @@ export function Board(props) {
     props.boardState[i] = value;
     props.setBoardState([...props.boardState]);
   };
+  const isOpponent = props.isOpponent;
 
   const renderedCells = props.boardState.map((s, i) => (
-    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} />
+    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} isOpponent={isOpponent}/>
   ));
 
   return <div>{renderTable(renderedCells, 5)}</div>;

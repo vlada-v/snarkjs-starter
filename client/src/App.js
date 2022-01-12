@@ -143,7 +143,7 @@ export function App() {
         />
       </div>
 
-      <Board boardState={boardState} setBoardState={setBoardState} />
+      <Board boardState={boardState} setBoardState={setBoardState} isOpponent={false}/>
       <button onClick={sendBoard}>Send initial board</button>
       <div>
         <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
@@ -152,6 +152,8 @@ export function App() {
       <div>{JSON.stringify(boardHashesState)}</div>
       <div>{JSON.stringify(movesState)}</div>
       <div>{JSON.stringify(answersState)}</div>
+      <div>Your Opponent's Board:</div>
+      <Board boardState={makeBoard(5, 5)} setBoardState={makeBoard(5, 5)} isOpponent={true}/>
     </div>
   );
 }
