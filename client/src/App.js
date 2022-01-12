@@ -17,6 +17,7 @@ export function App() {
   const [playerIdState, setPlayerIdState] = useState("");
   const [opponentIdState, setOpponentIdState] = useState("");
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
+  const [opponentBoardState, setOpponentBoardState] = useState(makeBoard(5, 5));
 
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);
@@ -50,6 +51,30 @@ export function App() {
           });
       }
     );
+  };
+
+  const constructBoardWithGuesses = () => {
+    setTextState("Updating guesses...");
+    fetch(url + "/get-game-state", {
+      method: "GET",
+      mode: "cors", // no-cors, cors, *same-origin
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        data = {answers: [{field: 2, answer: true}, {field: 13, answer: true}, {field: 24, answer: false}]}
+        console.log(data);
+        setTextState("Updated successfully");
+        const board = new Array(25).fill(null);
+        for (let i = 0; i < data.answers.length; i++){
+          board[data.answers[i].field] = data.answers[i].answer
+        }
+        console.log(board)
+        setOpponentBoardState(board);
+      })
+      .catch((error) => {
+        setTextState("Updating board failed");
+        console.log({ error: error });
+      });
   };
 
   const loadBoard = () => {
@@ -143,7 +168,7 @@ export function App() {
         />
       </div>
 
-      <Board boardState={boardState} setBoardState={setBoardState} isOpponent={false}/>
+      <Board boardState={boardState} setBoardState={setBoardState}/>
       <button onClick={sendBoard}>Send initial board</button>
       <div>
         <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
@@ -153,7 +178,7 @@ export function App() {
       <div>{JSON.stringify(movesState)}</div>
       <div>{JSON.stringify(answersState)}</div>
       <div>Your Opponent's Board:</div>
-      <Board boardState={makeBoard(5, 5)} setBoardState={makeBoard(5, 5)} isOpponent={true}/>
+      <Board boardState={opponentBoardState} setBoardState={constructBoardWithGuesses}/>
     </div>
   );
 }
