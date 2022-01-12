@@ -2,19 +2,20 @@ import { Board } from "./Board";
 import { useState, useEffect } from "react";
 import * as Circuit from "./Circuits";
 
+function generateRandomNumber() {
+  let rand1 = Math.floor(Math.random() * Math.pow(2, 30));
+  let rand2 = Math.floor(Math.random() * Math.pow(2, 30));
+  return rand1 * Math.pow(2, 30) + rand2;
+}
+
 /**
  * This is the root of the application.
  */
 export function App() {
-  const generateRandomNumber = () => {
-    let rand1 = Math.floor(Math.random() * Math.pow(2, 30));
-    let rand2 = Math.floor(Math.random() * Math.pow(2, 30));
-    return rand1 * Math.pow(2, 30) + rand2;
-  };
-
   const [boardState, setBoardState] = useState(makeBoard(5, 5));
   const [textState, setTextState] = useState("");
   const [playerIdState, setPlayerIdState] = useState("");
+  const [opponentIdState, setOpponentIdState] = useState("");
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
 
   const [boardHashesState, setBoardHashesState] = useState([]);
@@ -72,25 +73,24 @@ export function App() {
       });
   };
 
-  const processBoardProof = (boardProof) => {
-    Circuit.verifyBoardHash(boardProof.boardhash, boardProof.proof).then(
-      (res) => console.log(res)
-    );
+  const processBoardProof = async (boardProof) => {
+    return Circuit.verifyBoardHash(boardProof.boardhash, boardProof.proof);
   };
 
   const loadState = () => {
+    // console.log();
     fetch(url + "/get-game-state", {
       method: "GET",
       mode: "cors", // no-cors, cors, *same-origin
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.moves);
+        //console.log(data.moves);
         setBoardHashesState(data.boardhashes);
-        for (boardProof of data.boardhashes) {
-          console.log(boardProof);
+        /*for (boardProof of data.boardhashes) {
+          // console.log(boardProof);
           processBoardProof(boardProof);
-        }
+        }*/
         setMovesState(data.moves);
         setAnswersState(data.answers);
       })
@@ -99,8 +99,27 @@ export function App() {
       });
   };
 
+  const verifyOpponentBoard = () => {
+    setTextState("Verifying opponent's board...");
+    for (boardProof of boardHashesState) {
+      if (boardProof.player == opponentIdState) {
+        let proofValidity = processBoardProof(boardProof);
+        proofValidity.then((res) => {
+          console.log(res);
+          if (res) {
+            setTextState("Opponent's board verified to be legal");
+          } else {
+            setTextState("Opponent's board is illegal");
+          }
+        });
+        return;
+      }
+    }
+    setTextState("Opponent's board not found");
+  };
+
   useEffect(() => {
-    loadState();
+    setInterval(loadState, 5000);
   }, []);
 
   return (
@@ -119,11 +138,16 @@ export function App() {
           type="text"
           id="opponent-id"
           placeholder="Opponent's Player ID"
+          value={opponentIdState}
+          onChange={(event) => setOpponentIdState(event.target.value)}
         />
       </div>
 
       <Board boardState={boardState} setBoardState={setBoardState} />
       <button onClick={sendBoard}>Send initial board</button>
+      <div>
+        <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
+      </div>
       <div>{textState}</div>
       <div>{JSON.stringify(boardHashesState)}</div>
       <div>{JSON.stringify(movesState)}</div>
