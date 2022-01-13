@@ -51,5 +51,5 @@ export function Board(props) {
     <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} />
   ));
 
-  return <div>{renderTable(renderedCells, 5)}</div>;
+  return <div>{renderTable(renderedCells, 10)}</div>;
 }

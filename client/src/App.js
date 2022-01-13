@@ -12,13 +12,13 @@ function generateRandomNumber() {
  * This is the root of the application.
  */
 export function App() {
-  const [boardState, setBoardState] = useState(makeBoard(5, 5, false));
+  const [boardState, setBoardState] = useState(makeBoard(10, 10, false));
   const [textState, setTextState] = useState("");
   const [playerIdState, setPlayerIdState] = useState("");
   const [opponentIdState, setOpponentIdState] = useState("");
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
   const [opponentBoardState, setOpponentBoardState] = useState(
-    makeBoard(5, 5, null)
+    makeBoard(10, 10, null)
   );
 
   const [boardSent, setBoardSent] = useState(false);
@@ -40,7 +40,7 @@ export function App() {
     setBoardSent(true);
     setTextState("Sending board...");
     const boardHash = 123;
-    const proof = 345;
+    const proof = 3410;
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
         // console.log(boardHashProof, JSON.stringify(boardHashProof))
@@ -148,7 +148,7 @@ export function App() {
         };
         console.log(data);
         setTextState("Updated successfully");
-        const board = new Array(25).fill(null);
+        const board = new Array(210).fill(null);
         for (let i = 0; i < data.answers.length; i++) {
           board[data.answers[i].field] = data.answers[i].answer;
         }
@@ -252,7 +252,7 @@ export function App() {
   };
 
   useEffect(() => {
-    setInterval(loadState, 5000);
+    setInterval(loadState, 10000);
   }, []);
 
   return (

@@ -1,26 +1,8 @@
-export async function calculateProof() {
-  const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-    { a: 3, b: 11 },
-    require("url:../public/circuit.wasm"),
-    require("url:../public/circuit_final.zkey")
-  );
-  console.log(proof);
-  console.log(publicSignals);
-
-  const verificationKeyUrl = require("url:../public/verification_key.txt");
-  const vkey = await fetch(verificationKeyUrl).then(function (res) {
-    console.log(res);
-    return res.json();
-  });
-  const res = await snarkjs.groth16.verify(vkey, publicSignals, proof);
-  console.log(res);
-}
-
 export async function proveBoardHash(board, salt) {
   const { proof, publicSignals } = await snarkjs.groth16.fullProve(
     { board: board, nonce: salt },
-    require("url:../public/hasher_circuit.wasm"),
-    require("url:../public/hasher_circuit_final.zkey")
+    require("url:../public/battleship_circuit.wasm"),
+    require("url:../public/battleship_circuit_final.zkey")
   );
   console.log(proof);
   console.log(publicSignals);
@@ -29,7 +11,7 @@ export async function proveBoardHash(board, salt) {
 
 export async function verifyBoardHash(boardHash, proof) {
   console.log("started");
-  const verificationKeyUrl = require("url:../public/hasher_verification_key.txt");
+  const verificationKeyUrl = require("url:../public/battleship_verification_key.txt");
   const vkey = await fetch(verificationKeyUrl).then(function (res) {
     // console.log(res);
     return res.json();
