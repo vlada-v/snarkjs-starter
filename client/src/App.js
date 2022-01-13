@@ -251,7 +251,7 @@ export function App() {
   };
 
   useEffect(() => {
-    let interval = setInterval(loadState, 10000);
+    let interval = setInterval(loadState, 2000);
     return () => clearInterval(interval);
   }, [
     playerIdState,
