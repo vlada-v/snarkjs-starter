@@ -106,6 +106,7 @@ export function App() {
   };
 
   const answeredField = (field) => {
+    console.log(field, answersState, playerIdState);
     for (answer of answersState) {
       if (answer.player == playerIdState && answer.field == field) {
         return true;
@@ -174,27 +175,6 @@ export function App() {
       })
       .catch((error) => {
         setTextState("Updating board failed");
-        console.log({ error: error });
-      });
-  };
-
-  const loadBoard = () => {
-    /*console.log(movesState);
-    console.log(boardHashesState);
-    console.log(answersState);*/
-    setTextState("Loading board...");
-    fetch(url + "/get-board", {
-      method: "GET",
-      mode: "cors", // no-cors, cors, *same-origin
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        setTextState("Board loaded successfully");
-        setBoardState(data.board);
-      })
-      .catch((error) => {
-        setTextState("Loading board failed");
         console.log({ error: error });
       });
   };
@@ -273,7 +253,14 @@ export function App() {
   useEffect(() => {
     let interval = setInterval(loadState, 10000);
     return () => clearInterval(interval);
-  }, [playerIdState]);
+  }, [
+    playerIdState,
+    opponentIdState,
+    boardState,
+    boardHashesState,
+    movesState,
+    answersState,
+  ]);
 
   return (
     <div>
