@@ -265,7 +265,12 @@ export function App() {
   return (
     <div>
       {!boardSent ? (
-        <div>
+        <div
+        // style={{
+        //   display: "inline-block", // in line?
+        // }}
+        >
+          {/* <p>Enter your player id: </p> */}
           <input
             type="text"
             id="player-id"
@@ -276,7 +281,9 @@ export function App() {
             }}
           />
         </div>
-      ) : null}
+      ) : (
+        <p>Your player id: {playerIdState}</p>
+      )}
       {opponentBoardHash == 0 ? (
         <div>
           <input
@@ -287,8 +294,9 @@ export function App() {
             onChange={(event) => setOpponentIdState(event.target.value)}
           />
         </div>
-      ) : null}
-
+      ) : (
+        <p>Your opponent player id: {opponentIdState}</p>
+      )}
       <Board
         boardState={boardState}
         setBoardState={!boardSent ? setBoardState : (x) => null}
@@ -303,10 +311,6 @@ export function App() {
         </div>
       ) : null}
       <div>{textState}</div>
-      <div>{JSON.stringify(boardHashesState)}</div>
-      <div>{JSON.stringify(movesState)}</div>
-      <div>{JSON.stringify(answersState)}</div>
-
       {opponentBoardHash != 0 ? (
         <div>
           <div>Your Opponent's Board:</div>
@@ -317,6 +321,9 @@ export function App() {
           />
         </div>
       ) : null}
+      <div>{JSON.stringify(boardHashesState)}</div>
+      <div>{JSON.stringify(movesState)}</div>
+      <div>{JSON.stringify(answersState)}</div>
     </div>
   );
 }
