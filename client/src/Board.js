@@ -3,11 +3,9 @@ import React, { useState, useCallback } from "react";
 function Cell(props) {
   const flip = () => {
     console.log(props);
-    if (props.value != null){
+    if (props.value != null) {
       props.setCellValue(props.cellIndex, !props.value);
-    }
-    else {
-      
+    } else {
     }
   };
 
@@ -39,7 +37,7 @@ function renderTable(array, width) {
     }
   }
 
-  return <>{result}</>;
+  return result;
 }
 
 export function Board(props) {

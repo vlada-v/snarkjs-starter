@@ -17,10 +17,13 @@ export function App() {
   const [playerIdState, setPlayerIdState] = useState("");
   const [opponentIdState, setOpponentIdState] = useState("");
   const [boardSaltState, setBoardSaltState] = useState(generateRandomNumber());
-  const [opponentBoardState, setOpponentBoardState] = useState(makeBoard(5, 5, null));
+  const [opponentBoardState, setOpponentBoardState] = useState(
+    makeBoard(5, 5, null)
+  );
 
   const [boardSent, setBoardSent] = useState(false);
   const [opponentBoardHash, setOpponentBoardHash] = useState(0);
+  const [selectedOpponentField, setSelectedOpponentField] = useState(-1);
 
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);
@@ -66,11 +69,9 @@ export function App() {
 
   const answerQuery = (fieldId) => {
     setTextState("Answering query...");
-    const boardHash = 123;
-    const proof = 345;
     Circuit.proveBoardAnswer(boardState, boardSaltState, fieldId).then(
       (proofValue) => {
-        fetch(url + "/answer-query/" + playerIdState + fieldId, {
+        fetch(url + "/answer-query/" + playerIdState + "/" + fieldId, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -89,6 +90,45 @@ export function App() {
           });
       }
     );
+  };
+
+  const answeredField = (field) => {
+    for (answer of answersState) {
+      if (answer.player == playerIdState && answer.field == field) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const processQuery = (query) => {
+    // TODO: Add check for whose turn it is
+    if (query.player == playerIdState && !answeredField(query.field)) {
+      answerQuery(query.field);
+    }
+  };
+
+  const sendMove = () => {
+    if (selectedOpponentField == -1) {
+      setTextState("Select an unknown field first");
+    } else {
+      setTextState("Sending move...");
+      fetch(
+        url + "/post-move/" + opponentIdState + "/" + selectedOpponentField,
+        {
+          method: "GET",
+          mode: "cors", // no-cors, cors, *same-origin
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setTextState("Sent move successfully, waiting for reply...");
+        })
+        .catch((error) => {
+          console.log(error);
+          setTextState("Sending move failed");
+        });
+    }
   };
 
   const constructBoardWithGuesses = () => {
@@ -142,26 +182,49 @@ export function App() {
       });
   };
 
-  const processBoardProof = async (boardProof) => {
+  const verifyBoardProof = async (boardProof) => {
     return Circuit.verifyBoardHash(boardProof.boardhash, boardProof.proof);
   };
 
+  const verifyAnswer = async (field, answer, proof) => {
+    return Circuit.verifyBoardAnswer(opponentBoardHash, field, answer, proof);
+  };
+
+  const processAnswer = async (answer) => {
+    if (
+      answer.player == opponentIdState &&
+      opponentBoardState[answer.field] == null
+    ) {
+      setTextState("Verifying answer of opponent...");
+      verifyAnswer(answer.field, answer.answer, answer.proof).then((res) => {
+        if (res) {
+          const newOpponentBoard = opponentBoardState.slice();
+          newOpponentBoard[answer.field] = answer.answer == 1 ? true : false;
+          setOpponentBoardState(newOpponentBoard);
+          setTextState("Opponent's answer verified to be legal");
+        } else {
+          setTextState("Opponent's answer is illegal");
+        }
+      });
+    }
+  };
+
   const loadState = () => {
-    // console.log();
     fetch(url + "/get-game-state", {
       method: "GET",
-      mode: "cors", // no-cors, cors, *same-origin
+      mode: "cors",
     })
       .then((response) => response.json())
       .then((data) => {
-        //console.log(data.moves);
         setBoardHashesState(data.boardhashes);
-        /*for (boardProof of data.boardhashes) {
-          // console.log(boardProof);
-          processBoardProof(boardProof);
-        }*/
         setMovesState(data.moves);
         setAnswersState(data.answers);
+        for (query of data.moves) {
+          processQuery(query);
+        }
+        for (answer of data.answers) {
+          processAnswer(answer);
+        }
       })
       .catch((error) => {
         console.log({ error: error });
@@ -172,7 +235,7 @@ export function App() {
     setTextState("Verifying opponent's board...");
     for (boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
-        let proofValidity = processBoardProof(boardProof);
+        let proofValidity = verifyBoardProof(boardProof);
         proofValidity.then((res) => {
           console.log(res);
           if (res) {
