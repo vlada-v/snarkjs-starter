@@ -81,6 +81,7 @@ app.get("/get-board", function (req, res) {
 });
 
 app.get("/get-game-state", function (req, res) {
+  console.log(moves, answers);
   res.send({ boardhashes: boardhashes, moves: moves, answers: answers });
 });
 

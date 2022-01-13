@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { parentPort } from "worker_threads";
 
 function Cell(props) {
   const flip = () => {
@@ -6,6 +7,8 @@ function Cell(props) {
     if (props.value != null) {
       props.setCellValue(props.cellIndex, !props.value);
     } else {
+      props.clickAction(props.cellIndex);
+      // props.setCellValue(props.clickAction);
     }
   };
 
@@ -47,8 +50,12 @@ export function Board(props) {
     props.setBoardState(newBoardState);
   };
 
+  const clickAction = (i) => {
+    props.makeMove(i);
+  };
+
   const renderedCells = props.boardState.map((s, i) => (
-    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} />
+    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} clickAction={clickAction}/>
   ));
 
   return <div>{renderTable(renderedCells, 10)}</div>;

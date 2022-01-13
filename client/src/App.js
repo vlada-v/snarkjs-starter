@@ -103,12 +103,15 @@ export function App() {
 
   const processQuery = (query) => {
     // TODO: Add check for whose turn it is
+    console.log(query, playerIdState, (query.player == playerIdState), !answeredField(query.field)) //???
     if (query.player == playerIdState && !answeredField(query.field)) {
+      // if (!answeredField(query.field)) {
+      // console.log(query.field)
       answerQuery(query.field);
     }
   };
 
-  const sendMove = () => {
+  const sendMove = (selectedOpponentField) => {
     if (selectedOpponentField == -1) {
       setTextState("Select an unknown field first");
     } else {
@@ -139,13 +142,13 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        data = {
-          answers: [
-            { field: 2, answer: true },
-            { field: 13, answer: true },
-            { field: 24, answer: false },
-          ],
-        };
+        // data = {
+        //   answers: [
+        //     { field: 2, answer: true },
+        //     { field: 13, answer: true },
+        //     { field: 24, answer: false },
+        //   ],
+        // };
         console.log(data);
         setTextState("Updated successfully");
         const board = new Array(210).fill(null);
@@ -219,6 +222,7 @@ export function App() {
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
+        console.log(data.moves, data.answers)
         for (query of data.moves) {
           processQuery(query);
         }
@@ -304,6 +308,7 @@ export function App() {
           <Board
             boardState={opponentBoardState}
             setBoardState={constructBoardWithGuesses}
+            makeMove={sendMove}
           />
         </div>
       ) : null}
