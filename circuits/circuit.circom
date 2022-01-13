@@ -15,7 +15,7 @@ template BoardHasher(n) {
     signal output out_hash;
     component multiplexer = Multiplexer(1,n);
 
-    for (var i=0; i<n; i++) {
+    for (var i = 0; i < n; i++) {
         multiplexer.inp[i][0] <== board[i];
     }
     multiplexer.sel <== field;
@@ -28,7 +28,7 @@ template BoardHasher(n) {
 
     mimc.ins[0] <== nonce;
 
-    for (var i=0; i<n; i++) {
+    for (var i = 0; i < n; i++) {
         mimc.ins[i+1] <== board[i];
     }
     mimc.k <== 0;
@@ -38,4 +38,4 @@ template BoardHasher(n) {
 
 }
 
-component main = BoardHasher(25);
+component main = BoardHasher(100);
