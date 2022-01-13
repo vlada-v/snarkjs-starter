@@ -37,6 +37,7 @@ export function App() {
       setTextState("Specify a user id");
       return;
     }
+    console.log(playerIdState);
     setBoardSent(true);
     var boardProof;
     var validProof;
@@ -122,8 +123,6 @@ export function App() {
       !answeredField(query.field)
     ); //???
     if (query.player == playerIdState && !answeredField(query.field)) {
-      // if (!answeredField(query.field)) {
-      // console.log(query.field)
       answerQuery(query.field);
     }
   };
@@ -166,13 +165,11 @@ export function App() {
         //     { field: 24, answer: false },
         //   ],
         // };
-        console.log(data);
         setTextState("Updated successfully");
         const board = new Array(210).fill(null);
         for (let i = 0; i < data.answers.length; i++) {
           board[data.answers[i].field] = data.answers[i].answer;
         }
-        console.log(board);
         setOpponentBoardState(board);
       })
       .catch((error) => {
@@ -192,7 +189,7 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         setTextState("Board loaded successfully");
         setBoardState(data.board);
       })
@@ -240,7 +237,7 @@ export function App() {
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
-        //console.log(data.moves, data.answers);
+        console.log(data.moves, data.answers); //important to track
         for (query of data.moves) {
           processQuery(query);
         }
@@ -274,8 +271,9 @@ export function App() {
   };
 
   useEffect(() => {
-    setInterval(loadState, 10000);
-  }, []);
+    let interval = setInterval(loadState, 10000);
+    return () => clearInterval(interval);
+  }, [playerIdState]);
 
   return (
     <div>
@@ -286,7 +284,9 @@ export function App() {
             id="player-id"
             placeholder="Your Player ID"
             value={playerIdState}
-            onChange={(event) => setPlayerIdState(event.target.value)}
+            onChange={(event) => {
+              setPlayerIdState(event.target.value);
+            }}
           />
         </div>
       ) : null}
