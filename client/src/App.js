@@ -38,31 +38,43 @@ export function App() {
       return;
     }
     setBoardSent(true);
-    setTextState("Sending board...");
-    const boardHash = 123;
-    const proof = 3410;
+    var boardProof;
+    var validProof;
+    setTextState("Verifying your board...");
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
-        // console.log(boardHashProof, JSON.stringify(boardHashProof))
-        fetch(url + "/post-board-hash/" + playerIdState, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(boardHashProof),
-        })
-          .then((response) => {
-            if (response.status == 200) {
-              setTextState("Board sent successfully");
-            } else {
-              setBoardSent(false);
-              setTextState("Sending board failed");
-            }
-          })
-          .catch((error) => {
+        boardProof = boardHashProof;
+        verifyBoardProof(boardProof).then((res) => {
+          validProof = res;
+          if (res == false) {
             setBoardSent(false);
-            setTextState("Sending board failed");
-          });
+            setTextState("Your board is illegal");
+          } else {
+            setTextState("Sending your board...");
+
+            fetch(url + "/post-board-hash/" + playerIdState, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(boardProof),
+            })
+              .then((response) => {
+                console.log(response.status);
+                if (response.status == 200) {
+                  setTextState("Board sent successfully");
+                } else {
+                  setBoardSent(false);
+                  setTextState("Sending board failed");
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+                setBoardSent(false);
+                setTextState("Sending board failed");
+              });
+          }
+        });
       }
     );
   };
@@ -103,7 +115,12 @@ export function App() {
 
   const processQuery = (query) => {
     // TODO: Add check for whose turn it is
-    console.log(query, playerIdState, (query.player == playerIdState), !answeredField(query.field)) //???
+    console.log(
+      query,
+      playerIdState,
+      query.player == playerIdState,
+      !answeredField(query.field)
+    ); //???
     if (query.player == playerIdState && !answeredField(query.field)) {
       // if (!answeredField(query.field)) {
       // console.log(query.field)
@@ -219,10 +236,11 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("a");
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
-        console.log(data.moves, data.answers)
+        //console.log(data.moves, data.answers);
         for (query of data.moves) {
           processQuery(query);
         }
