@@ -1,6 +1,7 @@
-import { Board } from "./Board";
+import { Board, Ship } from "./Board";
 import { useState, useEffect } from "react";
 import * as Circuit from "./Circuits";
+import "./App.css";
 
 function generateRandomNumber() {
   let rand1 = Math.floor(Math.random() * Math.pow(2, 30));
@@ -295,13 +296,10 @@ export function App() {
 
   return (
     <div>
+      <h1>ZK-Battleship</h1>
       {!boardSent ? (
-        <div
-        // style={{
-        //   display: "inline-block", // in line?
-        // }}
-        >
-          {/* <p>Enter your player id: </p> */}
+        <div>
+          <p>Enter your player id: </p>
           <input
             type="text"
             id="player-id"
@@ -317,6 +315,7 @@ export function App() {
       )}
       {opponentBoardHash == 0 ? (
         <div>
+          <p>Enter your opponent's id: </p>
           <input
             type="text"
             id="opponent-id"
@@ -331,40 +330,65 @@ export function App() {
       <p hidden={turnState == null}>
         It's your {turnState ? "" : "opponent's "} turn
       </p>
-      <Board
-        boardState={boardState}
-        setBoardState={!boardSent ? setBoardState : (x) => null}
-        isOpponent={false}
-      />
       {!boardSent ? (
-        <button onClick={sendBoard}>Send initial board</button>
+        <p>
+          Choose positions of your ships (so far images are just for visual
+          reference):
+        </p>
       ) : null}
-      {opponentBoardHash == 0 ? (
-        <div>
-          <button onClick={verifyOpponentBoard}>Verify opponent's board</button>
-        </div>
-      ) : null}
-      <div>{textState}</div>
-      {opponentBoardHash != 0 ? (
-        <div>
-          <div>Your Opponent's Board:</div>
-          <Board
-            boardState={opponentBoardState}
-            setBoardState={constructBoardWithGuesses}
-            // makeMove={sendMove}
-            // makeMove={chooseMove}
-            isOpponent={true}
-            chosenShot={chosenShot}
-            setChosenShot={setChosenShot}
-          />
-          <button
-            onClick={sendMove}
-            disabled={chosenShot == null || !turnState}
-          >
-            FIREEEEE!!!
+      <div id="ships">
+        <Ship size={3} /> <Ship size={2} /> <Ship size={2} /> <Ship size={1} />
+      </div>
+      <div id="game">
+        <div id="players">
+          <div id="board">
+            <Board
+              boardState={boardState}
+              setBoardState={!boardSent ? setBoardState : (x) => null}
+              isOpponent={false}
+            />
+          </div>
+          {/* {!boardSent ? ( */}
+          <button onClick={sendBoard} disabled={boardSent}>
+            Send initial board
           </button>
+          {/* // ) : null} */}
+          {/* {opponentBoardHash == 0 ? ( */}
+          <div>
+            <button
+              disabled={opponentBoardHash != 0}
+              onClick={verifyOpponentBoard}
+            >
+              Verify opponent's board
+            </button>
+          </div>
+          {/* ) : null} */}
         </div>
-      ) : null}
+        <div id="players">
+          {opponentBoardHash != 0 ? (
+            <div>
+              {/* <div>Your Opponent's Board:</div> */}
+              <Board
+                boardState={opponentBoardState}
+                setBoardState={constructBoardWithGuesses}
+                // makeMove={sendMove}
+                // makeMove={chooseMove}
+                isOpponent={true}
+                chosenShot={chosenShot}
+                setChosenShot={setChosenShot}
+              />
+              <button
+                onClick={sendMove}
+                disabled={chosenShot == null || !turnState}
+              >
+                FIREEEEE!!!
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      <div>{textState}</div>
+
       <div>{JSON.stringify(boardHashesState)}</div>
       <div>{JSON.stringify(movesState)}</div>
       <div>{JSON.stringify(answersState)}</div>

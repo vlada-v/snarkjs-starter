@@ -29,10 +29,28 @@ function Cell(props) {
           : props.value === null
           ? "gray"
           : props.value
-          ? "red"
-          : "blue",
+          ? "orangered"
+          : "rgb(14, 34, 151)",
       }}
       onClick={flip}
+    ></div>
+  );
+}
+
+export function Ship(props) {
+  return (
+    <div
+      style={{
+        display: "inline-block",
+        width: 25 * props.size,
+        height: 25,
+        borderColor: "rgb(148, 45, 14)",
+        borderStyle: "solid",
+        borderWidth: "2px",
+        borderRadius: "15px",
+        backgroundColor: "orangered",
+        marginTop: 30,
+      }}
     ></div>
   );
 }
