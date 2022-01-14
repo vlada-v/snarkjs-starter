@@ -22,6 +22,14 @@ h1 {
   text-shadow: 2px 2px black;
 }
 
+h2 {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: lighter;
+  font-size: 30px;
+  text-shadow: 2px 2px black;
+  margin: 20px;
+}
+
 p {
   margin: 0;
 }

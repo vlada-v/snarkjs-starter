@@ -36,6 +36,8 @@ export function App() {
   const [chosenShot, setChosenShot] = useState(null);
 
   const [turnState, setTurnState] = useState(null);
+  const [scoreState, setScoreState] = useState(8);
+  const [opponentScoreState, setOpponentScoreState] = useState(8);
 
   const url = "http://localhost:3000";
 
@@ -98,9 +100,13 @@ export function App() {
           .then((response) => {
             if (response.status == 200) {
               setTextState("Answer sent successfully: " + proofValue.value);
+              if (proofValue.value == 1) {
+                setScoreState(scoreState - 1);
+              }
               newAnswered = answeredFieldsState.slice();
               newAnswered[fieldId] = true;
               setAnsweredFieldsState(newAnswered);
+              console.log(setAnsweredFieldsState);
               if (proofValue.value == 0) {
                 setTurnState(true);
               }
@@ -211,6 +217,7 @@ export function App() {
             currAnswer.answer == 1 ? true : false;
           if (currAnswer.answer == 1) {
             setTurnState(true);
+            setOpponentScoreState(opponentScoreState - 1);
           } else {
             setTurnState(false);
           }
@@ -297,22 +304,23 @@ export function App() {
   return (
     <div>
       <h1>ZK-Battleship</h1>
-      {!boardSent ? (
-        <div>
-          <p>Enter your player id: </p>
-          <input
-            type="text"
-            id="player-id"
-            placeholder="Your Player ID"
-            value={playerIdState}
-            onChange={(event) => {
-              setPlayerIdState(event.target.value);
-            }}
-          />
-        </div>
-      ) : (
-        <p>Your player id: {playerIdState}</p>
-      )}
+      {
+        !boardSent ? (
+          <div>
+            <p>Enter your player id: </p>
+            <input
+              type="text"
+              id="player-id"
+              placeholder="Your Player ID"
+              value={playerIdState}
+              onChange={(event) => {
+                setPlayerIdState(event.target.value);
+              }}
+            />
+          </div>
+        ) : null
+        // <p>Your player id: {playerIdState}</p>
+      }
       {opponentBoardHash == 0 ? (
         <div>
           <p>Enter your opponent's id: </p>
@@ -324,23 +332,29 @@ export function App() {
             onChange={(event) => setOpponentIdState(event.target.value)}
           />
         </div>
-      ) : (
-        <p>Your opponent player id: {opponentIdState}</p>
-      )}
+      ) : // <p>Your opponent player id: {opponentIdState}</p>
+      null}
+      {scoreState == 0 ? <h2>{playerIdState}, you lost :(((</h2> : null}
+      {opponentScoreState == 0 ? <h2>{playerIdState}, you won!!!</h2> : null}
       <p hidden={turnState == null}>
         It's your {turnState ? "" : "opponent's "} turn
       </p>
       {!boardSent ? (
-        <p>
-          Choose positions of your ships (so far images are just for visual
-          reference):
-        </p>
+        <div>
+          <p>
+            Choose positions of your ships (so far images are just for visual
+            reference):
+          </p>
+          <div id="ships">
+            <Ship size={3} /> <Ship size={2} /> <Ship size={2} />{" "}
+            <Ship size={1} />
+          </div>
+        </div>
       ) : null}
-      <div id="ships">
-        <Ship size={3} /> <Ship size={2} /> <Ship size={2} /> <Ship size={1} />
-      </div>
       <div id="game">
         <div id="players">
+          {boardSent ? <h2>{playerIdState}</h2> : null}
+          <h2>SCORE: {scoreState}</h2>
           <div id="board">
             <Board
               boardState={boardState}
@@ -367,6 +381,8 @@ export function App() {
         {/* <div > */}
         {opponentBoardHash != 0 ? (
           <div id="players">
+            {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
+            <h2>SCORE: {opponentScoreState}</h2>
             {/* <div>Your Opponent's Board:</div> */}
             <Board
               boardState={opponentBoardState}
