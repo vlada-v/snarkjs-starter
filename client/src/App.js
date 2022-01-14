@@ -364,28 +364,28 @@ export function App() {
           </div>
           {/* ) : null} */}
         </div>
-        <div id="players">
-          {opponentBoardHash != 0 ? (
-            <div>
-              {/* <div>Your Opponent's Board:</div> */}
-              <Board
-                boardState={opponentBoardState}
-                setBoardState={constructBoardWithGuesses}
-                // makeMove={sendMove}
-                // makeMove={chooseMove}
-                isOpponent={true}
-                chosenShot={chosenShot}
-                setChosenShot={setChosenShot}
-              />
-              <button
-                onClick={sendMove}
-                disabled={chosenShot == null || !turnState}
-              >
-                FIREEEEE!!!
-              </button>
-            </div>
-          ) : null}
-        </div>
+        {/* <div > */}
+        {opponentBoardHash != 0 ? (
+          <div id="players">
+            {/* <div>Your Opponent's Board:</div> */}
+            <Board
+              boardState={opponentBoardState}
+              setBoardState={constructBoardWithGuesses}
+              // makeMove={sendMove}
+              // makeMove={chooseMove}
+              isOpponent={true}
+              chosenShot={chosenShot}
+              setChosenShot={setChosenShot}
+            />
+            <button
+              onClick={sendMove}
+              disabled={chosenShot == null || !turnState}
+            >
+              FIREEEEE!!!
+            </button>
+          </div>
+        ) : null}
+        {/* </div> */}
       </div>
       <div>{textState}</div>
 

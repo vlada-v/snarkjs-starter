@@ -32,11 +32,13 @@ p {
   display: "inline-block";
   align-items: center;
   margin: auto;
+  /* align-content: center; */
 }
 
 #game {
   display: flex;
   margin: auto;
+  /* align-content: center; */
   /* flex-wrap: wrap; */
   /* align-content: center; */
 }
