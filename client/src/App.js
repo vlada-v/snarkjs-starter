@@ -28,6 +28,7 @@ export function App() {
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);
   const [answersState, setAnswersState] = useState([]);
+  const [chosenShot, setChosenShot] = useState(null);
 
   //console.log(boardState);
   const url = "http://localhost:3000";
@@ -128,18 +129,18 @@ export function App() {
     }
   };
 
-  const sendMove = (selectedOpponentField) => {
-    if (selectedOpponentField == -1) {
+  const sendMove = () => {
+    // console.log(chosenShot);
+    // console.log("shooting: " + chosenShot);
+    setChosenShot(null);
+    if (chosenShot == -1) {
       setTextState("Select an unknown field first");
     } else {
       setTextState("Sending move...");
-      fetch(
-        url + "/post-move/" + opponentIdState + "/" + selectedOpponentField,
-        {
-          method: "GET",
-          mode: "cors", // no-cors, cors, *same-origin
-        }
-      )
+      fetch(url + "/post-move/" + opponentIdState + "/" + chosenShot, {
+        method: "GET",
+        mode: "cors", // no-cors, cors, *same-origin
+      })
         .then((response) => response.json())
         .then((data) => {
           setTextState("Sent move successfully, waiting for reply...");
@@ -264,6 +265,7 @@ export function App() {
 
   useEffect(() => {
     let interval = setInterval(loadState, 2000);
+    console.log("chosen shot" + chosenShot);
     return () => clearInterval(interval);
   }, [
     playerIdState,
@@ -330,8 +332,15 @@ export function App() {
           <Board
             boardState={opponentBoardState}
             setBoardState={constructBoardWithGuesses}
-            makeMove={sendMove}
+            // makeMove={sendMove}
+            // makeMove={chooseMove}
+            isOpponent={true}
+            chosenShot={chosenShot}
+            setChosenShot={setChosenShot}
           />
+          <button onClick={sendMove} disabled={chosenShot == null}>
+            FIREEEEE!!!
+          </button>
         </div>
       ) : null}
       <div>{JSON.stringify(boardHashesState)}</div>
