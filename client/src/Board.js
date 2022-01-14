@@ -4,7 +4,8 @@ import { parentPort } from "worker_threads";
 function Cell(props) {
   const flip = () => {
     console.log(props);
-    if (props.value != null) {
+    // isOpponent={false}
+    if (props.isOpponent == false) {
       props.setCellValue(props.cellIndex, !props.value);
     } else {
       props.clickAction(props.cellIndex);
@@ -21,8 +22,13 @@ function Cell(props) {
         borderColor: "black",
         borderStyle: "solid",
         borderWidth: "1px",
-        backgroundColor:
-          props.value === null ? "gray" : props.value ? "red" : "blue",
+        backgroundColor: props.isChosen
+          ? "orange"
+          : props.value === null
+          ? "gray"
+          : props.value
+          ? "red"
+          : "blue",
       }}
       onClick={flip}
     ></div>
@@ -51,11 +57,19 @@ export function Board(props) {
   };
 
   const clickAction = (i) => {
-    props.makeMove(i);
+    props.setChosenShot(i);
   };
 
   const renderedCells = props.boardState.map((s, i) => (
-    <Cell key={i} value={s} cellIndex={i} setCellValue={setCellValue} clickAction={clickAction}/>
+    <Cell
+      key={i}
+      value={s}
+      cellIndex={i}
+      setCellValue={setCellValue}
+      clickAction={clickAction}
+      isOpponent={props.isOpponent}
+      isChosen={props.chosenShot == i}
+    />
   ));
 
   return <div>{renderTable(renderedCells, 10)}</div>;
