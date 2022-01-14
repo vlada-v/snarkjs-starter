@@ -1,6 +1,7 @@
 body {
   background-color: #556fa8;
   color: white;
+  margin-top: 60px;
   padding: 40px;
   font-family: Georgia, "Times New Roman", Times, serif;
   text-align: center;
@@ -15,9 +16,10 @@ button {
 }
 
 h1 {
-  font-family: Georgia, "Times New Roman", Times, serif;
+  font-family: "Courier New", Courier, monospace;
   font-weight: lighter;
-  font-size: 40px;
+  font-size: 60px;
+  text-shadow: 2px 2px black;
 }
 
 p {
