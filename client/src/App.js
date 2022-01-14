@@ -27,13 +27,15 @@ export function App() {
 
   const [boardSent, setBoardSent] = useState(false);
   const [opponentBoardHash, setOpponentBoardHash] = useState(0);
+  const [selfBoardHash, setSelfBoardHash] = useState(0);
 
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);
   const [answersState, setAnswersState] = useState([]);
   const [chosenShot, setChosenShot] = useState(null);
 
-  //console.log(boardState);
+  const [turnState, setTurnState] = useState(null);
+
   const url = "http://localhost:3000";
 
   const sendBoard = () => {
@@ -43,14 +45,10 @@ export function App() {
     }
     console.log(playerIdState);
     setBoardSent(true);
-    var boardProof;
-    var validProof;
     setTextState("Verifying your board...");
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
-        boardProof = boardHashProof;
-        verifyBoardProof(boardProof).then((res) => {
-          validProof = res;
+        verifyBoardProof(boardHashProof).then((res) => {
           if (res == false) {
             setBoardSent(false);
             setTextState("Your board is illegal");
@@ -62,11 +60,12 @@ export function App() {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(boardProof),
+              body: JSON.stringify(boardHashProof),
             })
               .then((response) => {
                 console.log(response.status);
                 if (response.status == 200) {
+                  setSelfBoardHash(boardHashProof.boardhash);
                   setTextState("Board sent successfully");
                 } else {
                   setBoardSent(false);
@@ -101,6 +100,9 @@ export function App() {
               newAnswered = answeredFieldsState.slice();
               newAnswered[fieldId] = true;
               setAnsweredFieldsState(newAnswered);
+              if (proofValue.value == 0) {
+                setTurnState(true);
+              }
             } else {
               setTextState("Sending answer failed");
             }
@@ -114,26 +116,26 @@ export function App() {
 
   const processQueries = () => {
     // TODO: Add check for whose turn it is
-    /*console.log(
-      query,
-      playerIdState,
-      query.player == playerIdState,
-      !answeredField(query.field)
-    ); */ //???
     for (query of movesState) {
-      if (query.player == playerIdState && !answeredFieldsState[query.field]) {
+      if (
+        query.player == playerIdState &&
+        !answeredFieldsState[query.field] &&
+        turnState == false
+      ) {
         answerQuery(query.field);
+        if (!boardState[query.field]) {
+          break;
+        }
       }
     }
   };
 
   const sendMove = () => {
-    // console.log(chosenShot);
-    // console.log("shooting: " + chosenShot);
     setChosenShot(null);
     if (chosenShot == -1) {
       setTextState("Select an unknown field first");
     } else {
+      setTurnState(null);
       setTextState("Sending move...");
       fetch(url + "/post-move/" + opponentIdState + "/" + chosenShot, {
         method: "GET",
@@ -145,6 +147,7 @@ export function App() {
         })
         .catch((error) => {
           console.log(error);
+          setTurnState(true);
           setTextState("Sending move failed");
         });
     }
@@ -158,13 +161,6 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // data = {
-        //   answers: [
-        //     { field: 2, answer: true },
-        //     { field: 13, answer: true },
-        //     { field: 24, answer: false },
-        //   ],
-        // };
         setTextState("Updated successfully");
         const board = new Array(210).fill(null);
         for (let i = 0; i < data.answers.length; i++) {
@@ -205,12 +201,18 @@ export function App() {
         ]);
       }
     }
+
     Promise.all(promises).then((results) => {
       for ([currAnswer, res] of results) {
         console.log(currAnswer, res);
         if (res) {
           newOpponentBoard[currAnswer.field] =
             currAnswer.answer == 1 ? true : false;
+          if (currAnswer.answer == 1) {
+            setTurnState(true);
+          } else {
+            setTurnState(false);
+          }
           setTextState("Opponent's answer verified to be legal");
         } else {
           setTextState("Opponent's answer is illegal");
@@ -231,7 +233,7 @@ export function App() {
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
-        console.log(data.moves, data.answers); //important to track
+        //console.log(data.moves, data.answers); //important to track
         //  for (query of data.moves) {
         //processQuery(query);
         // }
@@ -262,6 +264,17 @@ export function App() {
     setTextState("Opponent's board not found");
   };
 
+  const calculateStartingPlayer = () => {
+    if (opponentBoardHash != 0 && selfBoardHash != 0 && turnState == null) {
+      let sum = parseInt(selfBoardHash) + parseInt(opponentBoardHash);
+      if (sum % 2 == 1) {
+        setTurnState(parseInt(selfBoardHash) < parseInt(opponentBoardHash));
+      } else {
+        setTurnState(parseInt(selfBoardHash) >= parseInt(opponentBoardHash));
+      }
+    }
+  };
+
   useEffect(() => {
     processAnswers();
   }, [answersState]);
@@ -271,18 +284,14 @@ export function App() {
   }, [movesState]);
 
   useEffect(() => {
-    let interval = setInterval(loadState, 2000);
-    console.log("chosen shot" + chosenShot);
-    return () => clearInterval(interval);
-  }, [
-    playerIdState,
-    opponentIdState,
-    boardState,
-    opponentBoardState,
-    boardHashesState,
-    movesState,
-    answersState,
-  ]);
+    calculateStartingPlayer();
+  }, [opponentBoardHash, boardHashesState]);
+
+  useEffect(() => {
+    setInterval(loadState, 2000);
+    // console.log("chosen shot " + chosenShot);
+    // return () => clearInterval(interval);
+  }, []);
 
   return (
     <div>
@@ -319,6 +328,9 @@ export function App() {
       ) : (
         <p>Your opponent player id: {opponentIdState}</p>
       )}
+      <p hidden={turnState == null}>
+        It's your {turnState ? "" : "opponent's "} turn
+      </p>
       <Board
         boardState={boardState}
         setBoardState={!boardSent ? setBoardState : (x) => null}
@@ -345,7 +357,10 @@ export function App() {
             chosenShot={chosenShot}
             setChosenShot={setChosenShot}
           />
-          <button onClick={sendMove} disabled={chosenShot == null}>
+          <button
+            onClick={sendMove}
+            disabled={chosenShot == null || !turnState}
+          >
             FIREEEEE!!!
           </button>
         </div>
