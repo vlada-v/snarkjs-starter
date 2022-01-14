@@ -190,30 +190,36 @@ export function App() {
   const processAnswers = async () => {
     //console.log(answersState);
     const newOpponentBoard = opponentBoardState.slice();
+    const promises = [];
     for (answer of answersState) {
       let currAnswer = answer;
+      console.log(currAnswer, opponentIdState);
       if (
         currAnswer.player == opponentIdState &&
+        opponentBoardHash != 0 &&
         opponentBoardState[currAnswer.field] == null
       ) {
         setTextState("Verifying answer of opponent...");
-        verifyAnswer(
-          currAnswer.field,
-          currAnswer.answer,
-          currAnswer.proof
-        ).then((res) => {
-          //console.log(currAnswer.field);
-          if (res) {
-            newOpponentBoard[currAnswer.field] =
-              currAnswer.answer == 1 ? true : false;
-            setTextState("Opponent's answer verified to be legal");
-          } else {
-            setTextState("Opponent's answer is illegal");
-          }
-        });
+        promises.push([
+          currAnswer,
+          verifyAnswer(currAnswer.field, currAnswer.answer, currAnswer.proof),
+        ]);
       }
     }
-    setOpponentBoardState(newOpponentBoard);
+    Promise.all(promises).then((results) => {
+      for ([currAnswer, res] of results) {
+        console.log(currAnswer, res);
+        if (res) {
+          newOpponentBoard[currAnswer.field] =
+            currAnswer.answer == 1 ? true : false;
+          setTextState("Opponent's answer verified to be legal");
+        } else {
+          setTextState("Opponent's answer is illegal");
+        }
+      }
+      console.log(newOpponentBoard);
+      setOpponentBoardState(newOpponentBoard);
+    });
   };
 
   const loadState = () => {
@@ -223,7 +229,6 @@ export function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("a");
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
@@ -244,7 +249,7 @@ export function App() {
       if (boardProof.player == opponentIdState) {
         let proofValidity = verifyBoardProof(boardProof);
         proofValidity.then((res) => {
-          console.log(res);
+          //console.log(res);
           if (res) {
             setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
