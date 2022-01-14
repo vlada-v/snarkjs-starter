@@ -27,7 +27,6 @@ export function App() {
 
   const [boardSent, setBoardSent] = useState(false);
   const [opponentBoardHash, setOpponentBoardHash] = useState(0);
-  const [selectedOpponentField, setSelectedOpponentField] = useState(-1);
 
   const [boardHashesState, setBoardHashesState] = useState([]);
   const [movesState, setMovesState] = useState([]);

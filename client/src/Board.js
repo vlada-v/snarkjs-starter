@@ -8,7 +8,9 @@ function Cell(props) {
     if (props.isOpponent == false) {
       props.setCellValue(props.cellIndex, !props.value);
     } else {
-      props.clickAction(props.cellIndex);
+      if (props.value == null) {
+        props.clickAction(props.cellIndex);
+      }
       // props.setCellValue(props.clickAction);
     }
   };
