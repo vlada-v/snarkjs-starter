@@ -21,6 +21,10 @@ export function App() {
     makeBoard(10, 10, null)
   );
 
+  const [answeredFieldsState, setAnsweredFieldsState] = useState(
+    makeBoard(10, 10, false)
+  );
+
   const [boardSent, setBoardSent] = useState(false);
   const [opponentBoardHash, setOpponentBoardHash] = useState(0);
   const [selectedOpponentField, setSelectedOpponentField] = useState(-1);
@@ -94,7 +98,10 @@ export function App() {
         })
           .then((response) => {
             if (response.status == 200) {
-              setTextState("Answer sent successfully" + proofValue.value);
+              setTextState("Answer sent successfully: " + proofValue.value);
+              newAnswered = answeredFieldsState.slice();
+              newAnswered[fieldId] = true;
+              setAnsweredFieldsState(newAnswered);
             } else {
               setTextState("Sending answer failed");
             }
@@ -106,17 +113,7 @@ export function App() {
     );
   };
 
-  const answeredField = (field) => {
-    //console.log(field, answersState, playerIdState);
-    for (answer of answersState) {
-      if (answer.player == playerIdState && answer.field == field) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const processQuery = (query) => {
+  const processQueries = () => {
     // TODO: Add check for whose turn it is
     /*console.log(
       query,
@@ -124,8 +121,10 @@ export function App() {
       query.player == playerIdState,
       !answeredField(query.field)
     ); */ //???
-    if (query.player == playerIdState && !answeredField(query.field)) {
-      answerQuery(query.field);
+    for (query of movesState) {
+      if (query.player == playerIdState && !answeredFieldsState[query.field]) {
+        answerQuery(query.field);
+      }
     }
   };
 
@@ -234,9 +233,9 @@ export function App() {
         setMovesState(data.moves);
         setAnswersState(data.answers);
         console.log(data.moves, data.answers); //important to track
-        for (query of data.moves) {
-          processQuery(query);
-        }
+        //  for (query of data.moves) {
+        //processQuery(query);
+        // }
         // processAnswers();
       })
       .catch((error) => {
@@ -267,6 +266,10 @@ export function App() {
   useEffect(() => {
     processAnswers();
   }, [answersState]);
+
+  useEffect(() => {
+    processQueries();
+  }, [movesState]);
 
   useEffect(() => {
     let interval = setInterval(loadState, 2000);
