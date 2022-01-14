@@ -106,7 +106,7 @@ export function App() {
   };
 
   const answeredField = (field) => {
-    console.log(field, answersState, playerIdState);
+    //console.log(field, answersState, playerIdState);
     for (answer of answersState) {
       if (answer.player == playerIdState && answer.field == field) {
         return true;
@@ -117,12 +117,12 @@ export function App() {
 
   const processQuery = (query) => {
     // TODO: Add check for whose turn it is
-    console.log(
+    /*console.log(
       query,
       playerIdState,
       query.player == playerIdState,
       !answeredField(query.field)
-    ); //???
+    ); */ //???
     if (query.player == playerIdState && !answeredField(query.field)) {
       answerQuery(query.field);
     }
@@ -187,23 +187,33 @@ export function App() {
     return Circuit.verifyBoardAnswer(opponentBoardHash, field, answer, proof);
   };
 
-  const processAnswer = async (answer) => {
-    if (
-      answer.player == opponentIdState &&
-      opponentBoardState[answer.field] == null
-    ) {
-      setTextState("Verifying answer of opponent...");
-      verifyAnswer(answer.field, answer.answer, answer.proof).then((res) => {
-        if (res) {
-          const newOpponentBoard = opponentBoardState.slice();
-          newOpponentBoard[answer.field] = answer.answer == 1 ? true : false;
-          setOpponentBoardState(newOpponentBoard);
-          setTextState("Opponent's answer verified to be legal");
-        } else {
-          setTextState("Opponent's answer is illegal");
-        }
-      });
+  const processAnswers = async () => {
+    //console.log(answersState);
+    const newOpponentBoard = opponentBoardState.slice();
+    for (answer of answersState) {
+      let currAnswer = answer;
+      if (
+        currAnswer.player == opponentIdState &&
+        opponentBoardState[currAnswer.field] == null
+      ) {
+        setTextState("Verifying answer of opponent...");
+        verifyAnswer(
+          currAnswer.field,
+          currAnswer.answer,
+          currAnswer.proof
+        ).then((res) => {
+          //console.log(currAnswer.field);
+          if (res) {
+            newOpponentBoard[currAnswer.field] =
+              currAnswer.answer == 1 ? true : false;
+            setTextState("Opponent's answer verified to be legal");
+          } else {
+            setTextState("Opponent's answer is illegal");
+          }
+        });
+      }
     }
+    setOpponentBoardState(newOpponentBoard);
   };
 
   const loadState = () => {
@@ -221,9 +231,7 @@ export function App() {
         for (query of data.moves) {
           processQuery(query);
         }
-        for (answer of data.answers) {
-          processAnswer(answer);
-        }
+        // processAnswers();
       })
       .catch((error) => {
         console.log({ error: error });
@@ -251,12 +259,17 @@ export function App() {
   };
 
   useEffect(() => {
+    processAnswers();
+  }, [answersState]);
+
+  useEffect(() => {
     let interval = setInterval(loadState, 2000);
     return () => clearInterval(interval);
   }, [
     playerIdState,
     opponentIdState,
     boardState,
+    opponentBoardState,
     boardHashesState,
     movesState,
     answersState,
