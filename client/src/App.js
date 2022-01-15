@@ -50,8 +50,8 @@ export function App() {
   ]);
 
   const [turnState, setTurnState] = useState(null);
-  const [scoreState, setScoreState] = useState(8);
-  const [opponentScoreState, setOpponentScoreState] = useState(8);
+  const [shipCountState, setShipCountState] = useState(10);
+  const [opponentShipCountState, setOpponentShipCountState] = useState(10);
 
   const url = "http://localhost:3000";
 
@@ -159,9 +159,6 @@ export function App() {
             } else {
               setTextState("Answer sent successfully: hit");
             }
-            if (proofValue.value != 0) {
-              setScoreState(scoreState - 1);
-            }
             newAnswered = answeredFieldsState.slice();
             newAnswered[fieldId] = true;
             setAnsweredFieldsState(newAnswered);
@@ -169,6 +166,7 @@ export function App() {
             if (proofValue.value == 0) {
               setTurnState(true);
             } else if (proofValue.value > 1) {
+              setShipCountState(shipCountState - 1);
               newBoard = boardState.slice();
               newBoard[fieldId] = 2;
               let fieldX = Math.floor(fieldId / 10);
@@ -303,6 +301,8 @@ export function App() {
         if (res) {
           newOpponentBoard[currAnswer.field] = currAnswer.answer;
           if (currAnswer.answer >= 2) {
+            setOpponentShipCountState(opponentShipCountState - 1);
+
             let fieldX = Math.floor(currAnswer.field / 10);
             let fieldY = currAnswer.field % 10;
 
@@ -326,7 +326,6 @@ export function App() {
           }
           if (currAnswer.answer != 0) {
             setTurnState(true);
-            setOpponentScoreState(opponentScoreState - 1);
           } else {
             setTurnState(false);
           }
@@ -471,10 +470,10 @@ export function App() {
             />
           </div>
         ) : null}
-        {scoreState == 0 ? (
+        {shipCountState == 0 ? (
           <h1 id="result">{playerIdState}, you lost :(((</h1>
         ) : null}
-        {opponentScoreState == 0 ? (
+        {opponentShipCountState == 0 ? (
           <h1 id="result">{playerIdState}, you won!!!</h1>
         ) : null}
         <p hidden={turnState == null}>
@@ -489,19 +488,18 @@ export function App() {
             <div id="ships">
               <Ship size={5} />
               <br></br>
-              <Ship size={4} /> <Ship size={4} />
+              <Ship size={4} />
               <br></br>
-              <Ship size={3} /> <Ship size={3} /> <Ship size={3} />
+              <Ship size={3} /> <Ship size={3} />
               <br></br>
-              <Ship size={2} /> <Ship size={2} /> <Ship size={2} />{" "}
-              <Ship size={2} />
+              <Ship size={2} /> <Ship size={2} /> <Ship size={2} />
             </div>
           </div>
         ) : null}
         <div id="game" style={{ display: "flex", justifyContent: "center" }}>
           <div id="players">
             <h2>{playerIdState}</h2>
-            <h2>SCORE: {scoreState}</h2>
+            <h2>Remaining ships: {shipCountState}</h2>
             <div id="board">
               <Board
                 boardState={boardState}
@@ -526,7 +524,7 @@ export function App() {
           {opponentBoardHash != 0 ? (
             <div id="players">
               {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
-              <h2>SCORE: {opponentScoreState}</h2>
+              <h2>Remaining ships: {opponentShipCountState}</h2>
               <div id="board">
                 <Board
                   boardState={opponentBoardState}
@@ -541,8 +539,8 @@ export function App() {
                 disabled={
                   chosenShot == null ||
                   !turnState ||
-                  scoreState == 0 ||
-                  opponentScoreState == 0
+                  shipCountState == 0 ||
+                  opponentShipCountState == 0
                 }
               >
                 FIREEEEE!!!
