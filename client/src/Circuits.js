@@ -23,9 +23,9 @@ export async function verifyBoardHash(boardHash, proof) {
   return res;
 }
 
-export async function proveBoardAnswer(board, salt, field) {
+export async function proveBoardAnswer(board, salt, field, known) {
   const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-    { board: board, nonce: salt, field: field },
+    { board: board, nonce: salt, field: field, known: known },
     require("url:../public/move_circuit.wasm"),
     require("url:../public/move_circuit_final.zkey")
   );
@@ -35,7 +35,13 @@ export async function proveBoardAnswer(board, salt, field) {
   return { proof: proof, value: publicSignals[0] };
 }
 
-export async function verifyBoardAnswer(boardHash, field, answer, proof) {
+export async function verifyBoardAnswer(
+  boardHash,
+  field,
+  answer,
+  known,
+  proof
+) {
   // console.log("started");
   const verificationKeyUrl = require("url:../public/move_verification_key.txt");
   const vkey = await fetch(verificationKeyUrl).then(function (res) {
@@ -45,7 +51,7 @@ export async function verifyBoardAnswer(boardHash, field, answer, proof) {
   // console.log(vkey);
   const res = await snarkjs.groth16.verify(
     vkey,
-    [answer, boardHash, field],
+    [answer, boardHash, field, ...known],
     proof
   );
   // console.log("finished");

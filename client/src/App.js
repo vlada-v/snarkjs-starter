@@ -88,37 +88,40 @@ export function App() {
 
   const answerQuery = (fieldId) => {
     setTextState("Answering query...");
-    Circuit.proveBoardAnswer(boardState, boardSaltState, fieldId).then(
-      (proofValue) => {
-        fetch(url + "/answer-query/" + playerIdState + "/" + fieldId, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(proofValue),
-        })
-          .then((response) => {
-            if (response.status == 200) {
-              setTextState("Answer sent successfully: " + proofValue.value);
-              if (proofValue.value == 1) {
-                setScoreState(scoreState - 1);
-              }
-              newAnswered = answeredFieldsState.slice();
-              newAnswered[fieldId] = true;
-              setAnsweredFieldsState(newAnswered);
-              console.log(setAnsweredFieldsState);
-              if (proofValue.value == 0) {
-                setTurnState(true);
-              }
-            } else {
-              setTextState("Sending answer failed");
+    Circuit.proveBoardAnswer(
+      boardState,
+      boardSaltState,
+      fieldId,
+      answeredFieldsState
+    ).then((proofValue) => {
+      fetch(url + "/answer-query/" + playerIdState + "/" + fieldId, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(proofValue),
+      })
+        .then((response) => {
+          if (response.status == 200) {
+            setTextState("Answer sent successfully: " + proofValue.value);
+            if (proofValue.value == 1) {
+              setScoreState(scoreState - 1);
             }
-          })
-          .catch((error) => {
+            newAnswered = answeredFieldsState.slice();
+            newAnswered[fieldId] = true;
+            setAnsweredFieldsState(newAnswered);
+            console.log(setAnsweredFieldsState);
+            if (proofValue.value == 0) {
+              setTurnState(true);
+            }
+          } else {
             setTextState("Sending answer failed");
-          });
-      }
-    );
+          }
+        })
+        .catch((error) => {
+          setTextState("Sending answer failed");
+        });
+    });
   };
 
   const processQueries = () => {
@@ -186,7 +189,17 @@ export function App() {
   };
 
   const verifyAnswer = async (field, answer, proof) => {
-    return Circuit.verifyBoardAnswer(opponentBoardHash, field, answer, proof);
+    let known = [];
+    for (var i = 0; i < 100; i++) {
+      known.push(opponentBoardState[i] != null);
+    }
+    return Circuit.verifyBoardAnswer(
+      opponentBoardHash,
+      field,
+      answer,
+      known,
+      proof
+    );
   };
 
   const processAnswers = async () => {
@@ -214,8 +227,8 @@ export function App() {
         console.log(currAnswer, res);
         if (res) {
           newOpponentBoard[currAnswer.field] =
-            currAnswer.answer == 1 ? true : false;
-          if (currAnswer.answer == 1) {
+            currAnswer.answer != 0 ? true : false;
+          if (currAnswer.answer != 0) {
             setTurnState(true);
             setOpponentScoreState(opponentScoreState - 1);
           } else {
