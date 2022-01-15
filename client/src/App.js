@@ -48,7 +48,7 @@ export function App() {
       setTextState("Specify a user id");
       return;
     }
-    console.log(playerIdState);
+    // console.log(playerIdState);
     setBoardSent(true);
     setTextState("Verifying your board...");
     Circuit.proveBoardHash(boardState, boardSaltState).then(
@@ -68,7 +68,7 @@ export function App() {
               body: JSON.stringify(boardHashProof),
             })
               .then((response) => {
-                console.log(response.status);
+                //   console.log(response.status);
                 if (response.status == 200) {
                   setSelfBoardHash(boardHashProof.boardhash);
                   setTextState("Board sent successfully");
@@ -112,7 +112,7 @@ export function App() {
             newAnswered = answeredFieldsState.slice();
             newAnswered[fieldId] = true;
             setAnsweredFieldsState(newAnswered);
-            console.log(setAnsweredFieldsState);
+            // console.log(setAnsweredFieldsState);
             if (proofValue.value == 0) {
               setTurnState(true);
             } else if (proofValue.value > 1) {
@@ -120,7 +120,7 @@ export function App() {
               newBoard[fieldId] = 2;
               let fieldX = Math.floor(fieldId / 10);
               let fieldY = fieldId % 10;
-              for (var dir = 0; dir < 3; dir++) {
+              for (var dir = 0; dir < 4; dir++) {
                 for (var i = 1; i < 10; i++) {
                   let currField =
                     (fieldX + (dir < 2 ? (dir == 0 ? i : -i) : 0)) * 10 +
@@ -230,7 +230,7 @@ export function App() {
     const promises = [];
     for (answer of answersState) {
       let currAnswer = answer;
-      console.log(currAnswer, opponentIdState);
+      // console.log(currAnswer, opponentIdState);
       if (
         currAnswer.player == opponentIdState &&
         opponentBoardHash != 0 &&
@@ -246,13 +246,14 @@ export function App() {
 
     Promise.all(promises).then((results) => {
       for ([currAnswer, res] of results) {
-        console.log(currAnswer, res);
+        // console.log(currAnswer, res);
         if (res) {
           newOpponentBoard[currAnswer.field] = currAnswer.answer;
-          if (currAnswer.answer == 2) {
+          if (currAnswer.answer >= 2) {
             let fieldX = Math.floor(currAnswer.field / 10);
             let fieldY = currAnswer.field % 10;
-            for (var dir = 0; dir < 3; dir++) {
+
+            for (var dir = 0; dir < 4; dir++) {
               for (var i = 1; i < 10; i++) {
                 let currField =
                   (fieldX + (dir < 2 ? (dir == 0 ? i : -i) : 0)) * 10 +
@@ -282,7 +283,7 @@ export function App() {
           setTextState("Opponent's answer is illegal");
         }
       }
-      console.log(newOpponentBoard);
+      //  console.log(newOpponentBoard);
       setOpponentBoardState(newOpponentBoard);
     });
   };

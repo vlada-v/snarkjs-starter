@@ -31,7 +31,7 @@ export async function proveBoardAnswer(board, salt, field, known) {
   );
   //  console.log(proof);
   // console.log(publicSignals);
-  console.log(board, salt, field, publicSignals);
+  // console.log(board, salt, field, publicSignals);
   return { proof: proof, value: publicSignals[0] };
 }
 
