@@ -199,4 +199,4 @@ template BoardHasher(n, n1, n2, n3, n4, n5) {
     out_hash <== mimc.outs[0];
 }
 
-component main = BoardHasher(10,0,4,3,2,1);
+component main = BoardHasher(10,0,3,2,1,1);
