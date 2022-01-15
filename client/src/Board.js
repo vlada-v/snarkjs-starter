@@ -10,17 +10,17 @@ function getColor(props) {
   }
   if (props.isHit) {
     if (props.value == 0) {
-      return "rgb(15, 15, 130)";
+      return "rgb(18, 42, 95)";
     } else if (props.value == 1) {
-      return "rgb(180, 20, 20)";
+      return "rrgb(170, 33, 9)";
     } else {
-      return "rgb(25, 25, 25)";
+      return "rgb(90, 18, 5)";
     }
   } else {
     if (props.value == 0) {
-      return "rgb(40, 40, 230)";
+      return "rgb(31, 76, 172)";
     } else {
-      return "rgb(225,75,25)";
+      return "rgb(255, 76, 21)";
     }
   }
 }

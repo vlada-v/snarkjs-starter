@@ -439,7 +439,12 @@ export function App() {
             />
             <button
               onClick={sendMove}
-              disabled={chosenShot == null || !turnState}
+              disabled={
+                chosenShot == null ||
+                !turnState ||
+                scoreState == 0 ||
+                opponentScoreState == 0
+              }
             >
               FIREEEEE!!!
             </button>
