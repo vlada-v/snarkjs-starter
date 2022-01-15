@@ -13,7 +13,7 @@ function generateRandomNumber() {
  * This is the root of the application.
  */
 export function App() {
-  const [boardState, setBoardState] = useState(makeBoard(10, 10, false));
+  const [boardState, setBoardState] = useState(makeBoard(10, 10, 0));
   const [textState, setTextState] = useState("");
   const [playerIdState, setPlayerIdState] = useState("");
   const [opponentIdState, setOpponentIdState] = useState("");
@@ -113,6 +113,28 @@ export function App() {
             console.log(setAnsweredFieldsState);
             if (proofValue.value == 0) {
               setTurnState(true);
+            } else if (proofValue.value > 1) {
+              newBoard = boardState.slice();
+              newBoard[fieldId] = 2;
+              let fieldX = Math.floor(fieldId / 10);
+              let fieldY = fieldId % 10;
+              for (var dir = 0; dir < 3; dir++) {
+                for (var i = 1; i < 10; i++) {
+                  let currField =
+                    (fieldX + (dir < 2 ? (dir == 0 ? i : -i) : 0)) * 10 +
+                    fieldY +
+                    (dir >= 2 ? (dir == 2 ? i : -i) : 0);
+                  if (
+                    currField < 0 ||
+                    currField >= 100 ||
+                    newBoard[currField] == 0
+                  ) {
+                    break;
+                  }
+                  newBoard[currField] = 2;
+                }
+              }
+              setBoardState(newBoard);
             }
           } else {
             setTextState("Sending answer failed");
@@ -226,8 +248,28 @@ export function App() {
       for ([currAnswer, res] of results) {
         console.log(currAnswer, res);
         if (res) {
-          newOpponentBoard[currAnswer.field] =
-            currAnswer.answer != 0 ? true : false;
+          newOpponentBoard[currAnswer.field] = currAnswer.answer;
+          if (currAnswer.answer == 2) {
+            let fieldX = Math.floor(currAnswer.field / 10);
+            let fieldY = currAnswer.field % 10;
+            for (var dir = 0; dir < 3; dir++) {
+              for (var i = 1; i < 10; i++) {
+                let currField =
+                  (fieldX + (dir < 2 ? (dir == 0 ? i : -i) : 0)) * 10 +
+                  fieldY +
+                  (dir >= 2 ? (dir == 2 ? i : -i) : 0);
+                if (
+                  currField < 0 ||
+                  currField >= 100 ||
+                  newOpponentBoard[currField] == null ||
+                  newOpponentBoard[currField] == 0
+                ) {
+                  break;
+                }
+                newOpponentBoard[currField] = 2;
+              }
+            }
+          }
           if (currAnswer.answer != 0) {
             setTurnState(true);
             setOpponentScoreState(opponentScoreState - 1);
@@ -373,6 +415,7 @@ export function App() {
               boardState={boardState}
               setBoardState={!boardSent ? setBoardState : (x) => null}
               isOpponent={false}
+              answeredFieldsState={answeredFieldsState}
             />
           </div>
           {/* {!boardSent ? ( */}

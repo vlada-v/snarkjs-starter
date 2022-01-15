@@ -1,12 +1,36 @@
 import React, { useState, useCallback } from "react";
 import { parentPort } from "worker_threads";
 
+function getColor(props) {
+  if (props.isChosen) {
+    return "orange";
+  }
+  if (props.value == null) {
+    return "rgb(170,170,170)";
+  }
+  if (props.isHit) {
+    if (props.value == 0) {
+      return "rgb(15, 15, 130)";
+    } else if (props.value == 1) {
+      return "rgb(180, 20, 20)";
+    } else {
+      return "rgb(25, 25, 25)";
+    }
+  } else {
+    if (props.value == 0) {
+      return "rgb(40, 40, 230)";
+    } else {
+      return "rgb(225,75,25)";
+    }
+  }
+}
+
 function Cell(props) {
   const flip = () => {
     console.log(props);
     // isOpponent={false}
     if (props.isOpponent == false) {
-      props.setCellValue(props.cellIndex, !props.value);
+      props.setCellValue(props.cellIndex, props.value == 0 ? 1 : 0);
     } else {
       if (props.value == null) {
         props.clickAction(props.cellIndex);
@@ -24,13 +48,7 @@ function Cell(props) {
         borderColor: "black",
         borderStyle: "solid",
         borderWidth: "1px",
-        backgroundColor: props.isChosen
-          ? "orange"
-          : props.value === null
-          ? "gray"
-          : props.value
-          ? "orangered"
-          : "rgb(14, 34, 151)",
+        backgroundColor: getColor(props),
       }}
       onClick={flip}
     ></div>
@@ -89,6 +107,11 @@ export function Board(props) {
       clickAction={clickAction}
       isOpponent={props.isOpponent}
       isChosen={props.chosenShot == i}
+      isHit={
+        props.isOpponent
+          ? props.boardState[i] != null
+          : props.answeredFieldsState[i] == true
+      }
     />
   ));
 
