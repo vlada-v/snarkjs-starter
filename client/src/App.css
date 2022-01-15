@@ -20,7 +20,7 @@ button {
   transition-duration: 0.4s;
 }
 
-button:hover {
+button:hover:enabled {
   background-color: rgba(28, 82, 199, 0.521);
   color: white;
 }

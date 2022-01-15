@@ -38,6 +38,7 @@ app.post("/post-board-hash/:userid", function (req, res) {
       player: player,
       boardhash: req.body.boardhash,
       proof: req.body.proof,
+      time: Date.now(),
     });
     console.log(boardhashes);
     res.send({ success: true });
@@ -49,7 +50,11 @@ app.post("/post-board-hash/:userid", function (req, res) {
 
 app.get("/post-move/:userid/:field", function (req, res) {
   console.log("a");
-  moves.push({ player: req.params.userid, field: req.params.field });
+  moves.push({
+    player: req.params.userid,
+    field: req.params.field,
+    time: Date.now(),
+  });
   res.send({ success: true });
 });
 
@@ -59,6 +64,7 @@ app.post("/answer-query/:userid/:field", function (req, res) {
     field: req.params.field,
     answer: req.body.value,
     proof: req.body.proof,
+    time: Date.now(),
   });
   res.send({ success: true });
 });
@@ -87,6 +93,27 @@ app.get("/get-board", function (req, res) {
 });
 
 app.get("/get-game-state", function (req, res) {
+  let newBoardhashes = [];
+  for (boardhash of boardhashes) {
+    if (boardhash.time + 1000 * 60 * 60 > Date.now()) {
+      newBoardhashes.push(boardhash);
+    }
+  }
+  let newMoves = [];
+  for (move of moves) {
+    if (move.time + 1000 * 60 * 60 > Date.now()) {
+      newMoves.push(move);
+    }
+  }
+  let newAnswers = [];
+  for (answer of answers) {
+    if (answer.time + 1000 * 60 * 60 > Date.now()) {
+      newAnswers.push(answer);
+    }
+  }
+  boardhashes = newBoardhashes;
+  moves = newMoves;
+  answers = newAnswers;
   console.log(moves, answers);
   res.send({ boardhashes: boardhashes, moves: moves, answers: answers });
 });
