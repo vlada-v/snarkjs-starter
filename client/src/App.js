@@ -37,6 +37,18 @@ export function App() {
   const [answersState, setAnswersState] = useState([]);
   const [chosenShot, setChosenShot] = useState(null);
 
+  const [consoleText, setConsoleText] = useState([
+    "> Welcome to ZK-Battleship!",
+    <br />,
+    "> This game uses Zero-Knowledge proofs to ensure fairness of the players without revealing the actual positioning of the ships.",
+    <br />,
+    "> To start the game choose your player ID, your opponent's player ID, and position your ships on the board.",
+    <br />,
+    "> Select your ships by clicking on the cells where you would like to position your ships.",
+    <br />,
+    "> When you are done, send your board hash to lock your ship positioning without revealing it.",
+  ]);
+
   const [turnState, setTurnState] = useState(null);
   const [scoreState, setScoreState] = useState(8);
   const [opponentScoreState, setOpponentScoreState] = useState(8);
@@ -54,12 +66,24 @@ export function App() {
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
         verifyBoardProof(boardHashProof).then((res) => {
+          consoleText.push(<br />);
+          consoleText.push("> ");
+          consoleText.push(<br />);
           if (res == false) {
             setBoardSent(false);
             setTextState("Your board is illegal");
+            consoleText.push(
+              "> Your board is illegal!!! Choose the right number of ships, and remember that they cannot share a side or edge!"
+            );
+            setConsoleText(consoleText);
           } else {
             setTextState("Sending your board...");
-
+            consoleText.push(
+              "> Sending your board for your opponent to verify..."
+            );
+            consoleText.push(<br />);
+            consoleText.push("> " + JSON.stringify(boardHashProof));
+            setConsoleText(consoleText);
             fetch(url + "/post-board-hash/" + playerIdState, {
               method: "POST",
               headers: {
@@ -76,12 +100,25 @@ export function App() {
                       setTextState(
                         "This username is already in usage, choose another one"
                       );
+                      consoleText.push(<br />);
+                      consoleText.push(
+                        "> This username is already in usage, choose another one and resend"
+                      );
+                      setConsoleText(consoleText);
                     } else {
                       setSelfBoardHash(boardHashProof.boardhash);
+                      consoleText.push(<br />);
+                      consoleText.push(
+                        "> Board sent successfully! Verify the validity of opponent's board"
+                      );
+                      setConsoleText(consoleText);
                       setTextState("Board sent successfully");
                     }
                   } else {
                     setBoardSent(false);
+                    consoleText.push(<br />);
+                    consoleText.push("> Sending board failed :((( Try again");
+                    setConsoleText(consoleText);
                     setTextState("Sending board failed");
                   }
                 });
@@ -89,6 +126,9 @@ export function App() {
               .catch((error) => {
                 console.log(error);
                 setBoardSent(false);
+                consoleText.push(<br />);
+                consoleText.push("> Sending board failed :((( Try again");
+                setConsoleText(consoleText);
                 setTextState("Sending board failed");
               });
           }
@@ -320,9 +360,17 @@ export function App() {
   const verifyOpponentBoard = () => {
     if (opponentIdState == playerIdState) {
       setTextState("You can't be your own opponent");
+      consoleText.push(<br />);
+      consoleText.push("> You can't be your own opponent");
+      setConsoleText(consoleText);
       return;
     }
     setTextState("Verifying opponent's board...");
+    consoleText.push(<br />);
+    consoleText.push("> Verifying opponent's board...");
+    // consoleText.push(<br />);
+    // consoleText.push("> " + JSON.stringify(boardHashProof));
+    // setConsoleText(consoleText);
     for (boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
         let proofValidity = verifyBoardProof(boardProof);
@@ -330,14 +378,38 @@ export function App() {
           if (res) {
             setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
+            // consoleText.push(<br />);
+            // consoleText.push("> Verifying opponent's board...");
+            consoleText.push(<br />);
+            consoleText.push("> " + JSON.stringify(boardProof));
+            consoleText.push(<br />);
+            consoleText.push("> Opponent's board verified to be legal");
+            setConsoleText(consoleText);
+            setConsoleText(
+              "> Opponent's board verified to be legal! Let's start the game!"
+            );
           } else {
             setTextState("Opponent's board is illegal");
+            // consoleText.push(<br />);
+            // consoleText.push("> Verifying opponent's board...");
+            consoleText.push(<br />);
+            consoleText.push("> " + JSON.stringify(boardProof));
+            consoleText.push(<br />);
+            consoleText.push("> Opponent's board is illegal");
+            setConsoleText(consoleText);
           }
         });
         return;
       }
     }
     setTextState("Opponent's board not found");
+    // consoleText.push(<br />);
+    // consoleText.push("> Verifying opponent's board...");
+    // consoleText.push(<br />);
+    // consoleText.push("> " + JSON.stringify(boardHashProof));
+    consoleText.push(<br />);
+    consoleText.push("> Opponent's board not found");
+    setConsoleText(consoleText);
   };
 
   const calculateStartingPlayer = () => {
@@ -490,13 +562,16 @@ export function App() {
           position: "fixed",
           top: 0,
           right: 0,
-          padding: 20,
+          paddingLeft: 30,
+          paddingTop: 20,
           fontFamily: "Courier New",
+          textAlign: "left",
         }}
       >
-        <div>{JSON.stringify(boardHashesState)}</div>
+        <div style={{ lineHeight: 1.5 }}>{consoleText}</div>
+        {/* <div>{JSON.stringify(boardHashesState)}</div>
         <div>{JSON.stringify(movesState)}</div>
-        <div>{JSON.stringify(answersState)}</div>
+        <div>{JSON.stringify(answersState)}</div> */}
       </div>
     </div>
   );
