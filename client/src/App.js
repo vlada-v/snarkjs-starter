@@ -344,7 +344,7 @@ export function App() {
 
   useEffect(() => {
     calculateStartingPlayer();
-  }, [opponentBoardHash, boardHashesState]);
+  }, [opponentBoardHash, selfBoardHash]);
 
   useEffect(() => {
     setInterval(loadState, 2000);
@@ -404,7 +404,7 @@ export function App() {
       ) : null}
       <div id="game">
         <div id="players">
-          {boardSent ? <h2>{playerIdState}</h2> : null}
+          <h2>{playerIdState}</h2>
           <h2>SCORE: {scoreState}</h2>
           <div id="board">
             <Board
@@ -430,13 +430,15 @@ export function App() {
           <div id="players">
             {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
             <h2>SCORE: {opponentScoreState}</h2>
-            <Board
-              boardState={opponentBoardState}
-              setBoardState={constructBoardWithGuesses}
-              isOpponent={true}
-              chosenShot={chosenShot}
-              setChosenShot={setChosenShot}
-            />
+            <div id="board">
+              <Board
+                boardState={opponentBoardState}
+                setBoardState={constructBoardWithGuesses}
+                isOpponent={true}
+                chosenShot={chosenShot}
+                setChosenShot={turnState ? setChosenShot : (x) => null}
+              />
+            </div>
             <button
               onClick={sendMove}
               disabled={
@@ -448,6 +450,14 @@ export function App() {
             >
               FIREEEEE!!!
             </button>
+            <div>
+              <button
+                disabled={opponentBoardHash != 0}
+                onClick={verifyOpponentBoard}
+              >
+                Verify opponent's board
+              </button>
+            </div>
           </div>
         ) : null}
       </div>
