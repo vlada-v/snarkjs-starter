@@ -5,6 +5,7 @@ body {
   padding: 40px;
   font-family: Georgia, "Times New Roman", Times, serif;
   text-align: center;
+  align-items: center;
 }
 
 input {
@@ -30,6 +31,19 @@ h2 {
   margin: 20px;
 }
 
+h3 {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: lighter;
+  font-size: 20px;
+  margin: 0px;
+}
+h4 {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: lighter;
+  font-size: 15px;
+  margin: 0px;
+}
+
 p {
   margin: 0;
 }
@@ -42,13 +56,17 @@ p {
   display: "inline-block";
   align-items: center;
   margin: auto;
-  /* align-content: center; */
 }
 
 #game {
   display: flex;
   margin: auto;
-  /* align-content: center; */
-  /* flex-wrap: wrap; */
-  /* align-content: center; */
+}
+
+#result {
+  padding: 90px;
+  margin: 200px;
+  background-color: rgb(8, 8, 70);
+  border-radius: 40px;
+  text-align: center;
 }

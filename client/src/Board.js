@@ -28,14 +28,12 @@ function getColor(props) {
 function Cell(props) {
   const flip = () => {
     console.log(props);
-    // isOpponent={false}
     if (props.isOpponent == false) {
       props.setCellValue(props.cellIndex, props.value == 0 ? 1 : 0);
     } else {
       if (props.value == null) {
         props.clickAction(props.cellIndex);
       }
-      // props.setCellValue(props.clickAction);
     }
   };
 
@@ -49,6 +47,14 @@ function Cell(props) {
         borderStyle: "solid",
         borderWidth: "1px",
         backgroundColor: getColor(props),
+        // filter: props.isShot ? "brightness(35%)" : "brightness(100%)",
+        // backgroundColor: props.isChosen
+        //   ? "orange"
+        //   : props.value === null
+        //   ? "gray"
+        //   : props.value
+        //   ? "orangered"
+        //   : "rgb(14, 34, 151)",
       }}
       onClick={flip}
     ></div>
@@ -74,7 +80,6 @@ export function Ship(props) {
 }
 
 function renderTable(array, width) {
-  // console.log(array)
   let result = [];
 
   for (let i = 0; i < array.length; i++) {
@@ -112,6 +117,7 @@ export function Board(props) {
           ? props.boardState[i] != null
           : props.answeredFieldsState[i] == true
       }
+      // isShot={!props.isOpponent && props.answeredFieldsState[i]}
     />
   ));
 

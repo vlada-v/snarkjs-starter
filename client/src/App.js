@@ -2,6 +2,8 @@ import { Board, Ship } from "./Board";
 import { useState, useEffect } from "react";
 import * as Circuit from "./Circuits";
 import "./App.css";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 
 function generateRandomNumber() {
   let rand1 = Math.floor(Math.random() * Math.pow(2, 30));
@@ -147,7 +149,6 @@ export function App() {
   };
 
   const processQueries = () => {
-    // TODO: Add check for whose turn it is
     for (query of movesState) {
       if (
         query.player == playerIdState &&
@@ -225,7 +226,6 @@ export function App() {
   };
 
   const processAnswers = async () => {
-    //console.log(answersState);
     const newOpponentBoard = opponentBoardState.slice();
     const promises = [];
     for (answer of answersState) {
@@ -276,6 +276,7 @@ export function App() {
           } else {
             setTurnState(false);
           }
+
           setTextState("Opponent's answer verified to be legal");
         } else {
           setTextState("Opponent's answer is illegal");
@@ -296,11 +297,6 @@ export function App() {
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
-        //console.log(data.moves, data.answers); //important to track
-        //  for (query of data.moves) {
-        //processQuery(query);
-        // }
-        // processAnswers();
       })
       .catch((error) => {
         console.log({ error: error });
@@ -313,7 +309,6 @@ export function App() {
       if (boardProof.player == opponentIdState) {
         let proofValidity = verifyBoardProof(boardProof);
         proofValidity.then((res) => {
-          //console.log(res);
           if (res) {
             setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
@@ -359,26 +354,23 @@ export function App() {
   return (
     <div>
       <h1>ZK-Battleship</h1>
-      {
-        !boardSent ? (
-          <div>
-            <p>Enter your player id: </p>
-            <input
-              type="text"
-              id="player-id"
-              placeholder="Your Player ID"
-              value={playerIdState}
-              onChange={(event) => {
-                setPlayerIdState(event.target.value);
-              }}
-            />
-          </div>
-        ) : null
-        // <p>Your player id: {playerIdState}</p>
-      }
+      {!boardSent ? (
+        <div>
+          <h3>What's your name? </h3>
+          <input
+            type="text"
+            id="player-id"
+            placeholder="Your Player ID"
+            value={playerIdState}
+            onChange={(event) => {
+              setPlayerIdState(event.target.value);
+            }}
+          />
+        </div>
+      ) : null}
       {opponentBoardHash == 0 ? (
         <div>
-          <p>Enter your opponent's id: </p>
+          <h3>Choose your fighter! </h3>
           <input
             type="text"
             id="opponent-id"
@@ -387,19 +379,22 @@ export function App() {
             onChange={(event) => setOpponentIdState(event.target.value)}
           />
         </div>
-      ) : // <p>Your opponent player id: {opponentIdState}</p>
-      null}
-      {scoreState == 0 ? <h2>{playerIdState}, you lost :(((</h2> : null}
-      {opponentScoreState == 0 ? <h2>{playerIdState}, you won!!!</h2> : null}
+      ) : null}
+      {scoreState == 0 ? (
+        <h1 id="result">{playerIdState}, you lost :(((</h1>
+      ) : null}
+      {opponentScoreState == 0 ? (
+        <h1 id="result">{playerIdState}, you won!!!</h1>
+      ) : null}
       <p hidden={turnState == null}>
         It's your {turnState ? "" : "opponent's "} turn
       </p>
       {!boardSent ? (
         <div>
-          <p>
+          <h4>
             Choose positions of your ships (so far images are just for visual
             reference):
-          </p>
+          </h4>
           <div id="ships">
             <Ship size={3} /> <Ship size={2} /> <Ship size={2} />{" "}
             <Ship size={1} />
@@ -418,12 +413,9 @@ export function App() {
               answeredFieldsState={answeredFieldsState}
             />
           </div>
-          {/* {!boardSent ? ( */}
           <button onClick={sendBoard} disabled={boardSent}>
             Send initial board
           </button>
-          {/* // ) : null} */}
-          {/* {opponentBoardHash == 0 ? ( */}
           <div>
             <button
               disabled={opponentBoardHash != 0}
@@ -432,19 +424,14 @@ export function App() {
               Verify opponent's board
             </button>
           </div>
-          {/* ) : null} */}
         </div>
-        {/* <div > */}
         {opponentBoardHash != 0 ? (
           <div id="players">
             {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
             <h2>SCORE: {opponentScoreState}</h2>
-            {/* <div>Your Opponent's Board:</div> */}
             <Board
               boardState={opponentBoardState}
               setBoardState={constructBoardWithGuesses}
-              // makeMove={sendMove}
-              // makeMove={chooseMove}
               isOpponent={true}
               chosenShot={chosenShot}
               setChosenShot={setChosenShot}
@@ -457,7 +444,6 @@ export function App() {
             </button>
           </div>
         ) : null}
-        {/* </div> */}
       </div>
       <div>{textState}</div>
 
