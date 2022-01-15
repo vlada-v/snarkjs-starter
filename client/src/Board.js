@@ -27,7 +27,6 @@ function getColor(props) {
 
 function Cell(props) {
   const flip = () => {
-    console.log(props);
     if (props.isOpponent == false) {
       props.setCellValue(props.cellIndex, props.value == 0 ? 1 : 0);
     } else {
@@ -73,9 +72,11 @@ export function Ship(props) {
         borderWidth: "2px",
         borderRadius: "15px",
         backgroundColor: "orangered",
-        marginTop: 30,
+        margin: 4,
       }}
-    ></div>
+    >
+      {props.size}
+    </div>
   );
 }
 

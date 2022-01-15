@@ -415,8 +415,14 @@ export function App() {
               reference):
             </h4>
             <div id="ships">
-              <Ship size={3} /> <Ship size={2} /> <Ship size={2} />{" "}
-              <Ship size={1} />
+              <Ship size={5} />
+              <br></br>
+              <Ship size={4} /> <Ship size={4} />
+              <br></br>
+              <Ship size={3} /> <Ship size={3} /> <Ship size={3} />
+              <br></br>
+              <Ship size={2} /> <Ship size={2} /> <Ship size={2} />{" "}
+              <Ship size={2} />
             </div>
           </div>
         ) : null}
