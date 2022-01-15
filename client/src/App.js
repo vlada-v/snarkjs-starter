@@ -105,7 +105,11 @@ export function App() {
       })
         .then((response) => {
           if (response.status == 200) {
-            setTextState("Answer sent successfully: " + proofValue.value);
+            if (proofValue.value == 0) {
+              setTextState("Answer sent successfully: miss");
+            } else {
+              setTextState("Answer sent successfully: hit");
+            }
             if (proofValue.value != 0) {
               setScoreState(scoreState - 1);
             }
