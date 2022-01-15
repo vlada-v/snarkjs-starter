@@ -12,7 +12,7 @@ function getColor(props) {
     if (props.value == 0) {
       return "rgb(18, 42, 95)";
     } else if (props.value == 1) {
-      return "rrgb(170, 33, 9)";
+      return "rgb(170, 33, 9)";
     } else {
       return "rgb(90, 18, 5)";
     }
