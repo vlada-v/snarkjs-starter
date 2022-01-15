@@ -50,8 +50,8 @@ export function App() {
   ]);
 
   const [turnState, setTurnState] = useState(null);
-  const [shipCountState, setShipCountState] = useState(10);
-  const [opponentShipCountState, setOpponentShipCountState] = useState(10);
+  const [shipCountState, setShipCountState] = useState(7);
+  const [opponentShipCountState, setOpponentShipCountState] = useState(7);
 
   const url = "http://localhost:3000";
 
@@ -156,8 +156,22 @@ export function App() {
           if (response.status == 200) {
             if (proofValue.value == 0) {
               setTextState("Answer sent successfully: miss");
+              setConsoleText([
+                "> Answering query...",
+                <br />,
+                "> Answer sent successfully: miss, for field #" + fieldId,
+                <br />,
+                "> Proof: " + JSON.stringify(proofValue.proof),
+              ]);
             } else {
               setTextState("Answer sent successfully: hit");
+              setConsoleText([
+                "> Answering query...",
+                <br />,
+                "> Answer sent successfully: hit, for field #" + fieldId,
+                <br />,
+                "> Proof: " + JSON.stringify(proofValue.proof),
+              ]);
             }
             newAnswered = answeredFieldsState.slice();
             newAnswered[fieldId] = true;
@@ -228,11 +242,15 @@ export function App() {
         .then((response) => response.json())
         .then((data) => {
           setTextState("Sent move successfully, waiting for reply...");
+          setConsoleText(["> Sent move successfully, waiting for reply..."]);
         })
         .catch((error) => {
           console.log(error);
           setTurnState(true);
           setTextState("Sending move failed");
+          consoleText.push(<br />);
+          consoleText.push("> Sending move failed :((( Try again!");
+          setConsoleText(consoleText);
         });
     }
   };
@@ -288,6 +306,9 @@ export function App() {
         opponentBoardState[currAnswer.field] == null
       ) {
         setTextState("Verifying answer of opponent...");
+        consoleText.push(<br />);
+        consoleText.push("> Verifying answer of opponent...");
+        setConsoleText(consoleText);
         promises.push([
           currAnswer,
           verifyAnswer(currAnswer.field, currAnswer.answer, currAnswer.proof),
@@ -331,8 +352,19 @@ export function App() {
           }
 
           setTextState("Opponent's answer verified to be legal");
+          consoleText.push(<br />);
+          consoleText.push("> Opponent's answer verified to be legal");
+          consoleText.push(<br />);
+          consoleText.push("> Proof: " + JSON.stringify(currAnswer.proof));
+          setConsoleText(consoleText);
         } else {
           setTextState("Opponent's answer is illegal");
+          consoleText.push(<br />);
+          consoleText.push("> Opponent's answer is illegal");
+          consoleText.push(<br />);
+          consoleText.push(
+            "> Proof (failed): " + JSON.stringify(currAnswer.proof)
+          );
         }
       }
       //  console.log(newOpponentBoard);
@@ -367,9 +399,6 @@ export function App() {
     setTextState("Verifying opponent's board...");
     consoleText.push(<br />);
     consoleText.push("> Verifying opponent's board...");
-    // consoleText.push(<br />);
-    // consoleText.push("> " + JSON.stringify(boardHashProof));
-    // setConsoleText(consoleText);
     for (boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
         let proofValidity = verifyBoardProof(boardProof);
@@ -377,20 +406,16 @@ export function App() {
           if (res) {
             setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
-            // consoleText.push(<br />);
-            // consoleText.push("> Verifying opponent's board...");
             consoleText.push(<br />);
             consoleText.push("> " + JSON.stringify(boardProof));
             consoleText.push(<br />);
             consoleText.push("> Opponent's board verified to be legal");
             setConsoleText(consoleText);
-            setConsoleText(
-              "> Opponent's board verified to be legal! Let's start the game!"
-            );
+            setConsoleText([
+              "> Opponent's board verified to be legal! Let's start the game!",
+            ]);
           } else {
             setTextState("Opponent's board is illegal");
-            // consoleText.push(<br />);
-            // consoleText.push("> Verifying opponent's board...");
             consoleText.push(<br />);
             consoleText.push("> " + JSON.stringify(boardProof));
             consoleText.push(<br />);
@@ -402,10 +427,6 @@ export function App() {
       }
     }
     setTextState("Opponent's board not found");
-    // consoleText.push(<br />);
-    // consoleText.push("> Verifying opponent's board...");
-    // consoleText.push(<br />);
-    // consoleText.push("> " + JSON.stringify(boardHashProof));
     consoleText.push(<br />);
     consoleText.push("> Opponent's board not found");
     setConsoleText(consoleText);
@@ -476,9 +497,9 @@ export function App() {
         {opponentShipCountState == 0 ? (
           <h1 id="result">{playerIdState}, you won!!!</h1>
         ) : null}
-        <p hidden={turnState == null}>
+        <h3 hidden={turnState == null}>
           It's your {turnState ? "" : "opponent's "} turn
-        </p>
+        </h3>
         {!boardSent ? (
           <div>
             <h4>
@@ -548,7 +569,7 @@ export function App() {
             </div>
           ) : null}
         </div>
-        <div>{textState}</div>
+        <h4>{textState}</h4>
       </div>
       <div
         id="console"
@@ -561,12 +582,24 @@ export function App() {
           top: 0,
           right: 0,
           paddingLeft: 30,
+          paddingRight: 30,
+          paddingBottom: 20,
           paddingTop: 20,
           fontFamily: "Courier New",
           textAlign: "left",
+          textOverflow: "ellipsis",
+          overflowWrap: "anywhere",
         }}
       >
-        <div style={{ lineHeight: 1.5 }}>{consoleText}</div>
+        <div
+          style={{
+            lineHeight: 1.5,
+            textOverflow: "ellipsis",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {consoleText}
+        </div>
         {/* <div>{JSON.stringify(boardHashesState)}</div>
         <div>{JSON.stringify(movesState)}</div>
         <div>{JSON.stringify(answersState)}</div> */}
