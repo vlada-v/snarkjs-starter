@@ -106,7 +106,7 @@ export function App() {
         .then((response) => {
           if (response.status == 200) {
             setTextState("Answer sent successfully: " + proofValue.value);
-            if (proofValue.value == 1) {
+            if (proofValue.value != 0) {
               setScoreState(scoreState - 1);
             }
             newAnswered = answeredFieldsState.slice();
