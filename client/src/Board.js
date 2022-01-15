@@ -79,6 +79,28 @@ export function Ship(props) {
   );
 }
 
+export function Console() {
+  return (
+    <div
+      style={{
+        display: "inline-block",
+        width: "20%",
+        height: "100%",
+        backgroundColor: "black",
+        position: "fixed",
+        top: 0,
+        right: 0,
+        // borderColor: "rgb(148, 45, 14)",
+        // borderStyle: "solid",
+        // borderWidth: "2px",
+        // borderRadius: "15px",
+        // backgroundColor: "orangered",
+        // marginLeft: 30,
+      }}
+    ></div>
+  );
+}
+
 function renderTable(array, width) {
   let result = [];
 

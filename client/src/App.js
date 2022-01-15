@@ -1,4 +1,4 @@
-import { Board, Ship } from "./Board";
+import { Board, Ship, Console } from "./Board";
 import { useState, useEffect } from "react";
 import * as Circuit from "./Circuits";
 import "./App.css";
@@ -353,119 +353,128 @@ export function App() {
   }, []);
 
   return (
-    <div>
-      <h1>ZK-Battleship</h1>
-      {!boardSent ? (
-        <div>
-          <h3>What's your name? </h3>
-          <input
-            type="text"
-            id="player-id"
-            placeholder="Your Player ID"
-            value={playerIdState}
-            onChange={(event) => {
-              setPlayerIdState(event.target.value);
-            }}
-          />
-        </div>
-      ) : null}
-      {opponentBoardHash == 0 ? (
-        <div>
-          <h3>Choose your fighter! </h3>
-          <input
-            type="text"
-            id="opponent-id"
-            placeholder="Opponent's Player ID"
-            value={opponentIdState}
-            onChange={(event) => setOpponentIdState(event.target.value)}
-          />
-        </div>
-      ) : null}
-      {scoreState == 0 ? (
-        <h1 id="result">{playerIdState}, you lost :(((</h1>
-      ) : null}
-      {opponentScoreState == 0 ? (
-        <h1 id="result">{playerIdState}, you won!!!</h1>
-      ) : null}
-      <p hidden={turnState == null}>
-        It's your {turnState ? "" : "opponent's "} turn
-      </p>
-      {!boardSent ? (
-        <div>
-          <h4>
-            Choose positions of your ships (so far images are just for visual
-            reference):
-          </h4>
-          <div id="ships">
-            <Ship size={3} /> <Ship size={2} /> <Ship size={2} />{" "}
-            <Ship size={1} />
-          </div>
-        </div>
-      ) : null}
-      <div id="game">
-        <div id="players">
-          <h2>{playerIdState}</h2>
-          <h2>SCORE: {scoreState}</h2>
-          <div id="board">
-            <Board
-              boardState={boardState}
-              setBoardState={!boardSent ? setBoardState : (x) => null}
-              isOpponent={false}
-              answeredFieldsState={answeredFieldsState}
+    <div style={{ display: "flex", justifyContent: "center", width: "80%" }}>
+      <div>
+        <h1>ZK-Battleship</h1>
+        {!boardSent ? (
+          <div>
+            <h3>What's your name? </h3>
+            <input
+              type="text"
+              id="player-id"
+              placeholder="Your Player ID"
+              value={playerIdState}
+              onChange={(event) => {
+                setPlayerIdState(event.target.value);
+              }}
             />
           </div>
-          <button onClick={sendBoard} disabled={boardSent}>
-            Send initial board
-          </button>
+        ) : null}
+        {opponentBoardHash == 0 ? (
           <div>
-            <button
-              disabled={opponentBoardHash != 0}
-              onClick={verifyOpponentBoard}
-            >
-              Verify opponent's board
-            </button>
+            <h3>Choose your fighter! </h3>
+            <input
+              type="text"
+              id="opponent-id"
+              placeholder="Opponent's Player ID"
+              value={opponentIdState}
+              onChange={(event) => setOpponentIdState(event.target.value)}
+            />
           </div>
-        </div>
-        {opponentBoardHash != 0 ? (
+        ) : null}
+        {scoreState == 0 ? (
+          <h1 id="result">{playerIdState}, you lost :(((</h1>
+        ) : null}
+        {opponentScoreState == 0 ? (
+          <h1 id="result">{playerIdState}, you won!!!</h1>
+        ) : null}
+        <p hidden={turnState == null}>
+          It's your {turnState ? "" : "opponent's "} turn
+        </p>
+        {!boardSent ? (
+          <div>
+            <h4>
+              Choose positions of your ships (so far images are just for visual
+              reference):
+            </h4>
+            <div id="ships">
+              <Ship size={3} /> <Ship size={2} /> <Ship size={2} />{" "}
+              <Ship size={1} />
+            </div>
+          </div>
+        ) : null}
+        <div id="game" style={{ display: "flex", justifyContent: "center" }}>
           <div id="players">
-            {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
-            <h2>SCORE: {opponentScoreState}</h2>
+            <h2>{playerIdState}</h2>
+            <h2>SCORE: {scoreState}</h2>
             <div id="board">
               <Board
-                boardState={opponentBoardState}
-                setBoardState={constructBoardWithGuesses}
-                isOpponent={true}
-                chosenShot={chosenShot}
-                setChosenShot={turnState ? setChosenShot : (x) => null}
+                boardState={boardState}
+                setBoardState={!boardSent ? setBoardState : (x) => null}
+                isOpponent={false}
+                answeredFieldsState={answeredFieldsState}
               />
             </div>
-            <button
-              onClick={sendMove}
-              disabled={
-                chosenShot == null ||
-                !turnState ||
-                scoreState == 0 ||
-                opponentScoreState == 0
-              }
-            >
-              FIREEEEE!!!
-            </button>
-            <div>
+            {!boardSent ? (
+              <button onClick={sendBoard} disabled={boardSent}>
+                Send initial board
+              </button>
+            ) : (
               <button
                 disabled={opponentBoardHash != 0}
                 onClick={verifyOpponentBoard}
               >
                 Verify opponent's board
               </button>
-            </div>
+            )}
           </div>
-        ) : null}
+          {opponentBoardHash != 0 ? (
+            <div id="players">
+              {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
+              <h2>SCORE: {opponentScoreState}</h2>
+              <div id="board">
+                <Board
+                  boardState={opponentBoardState}
+                  setBoardState={constructBoardWithGuesses}
+                  isOpponent={true}
+                  chosenShot={chosenShot}
+                  setChosenShot={turnState ? setChosenShot : (x) => null}
+                />
+              </div>
+              <button
+                onClick={sendMove}
+                disabled={
+                  chosenShot == null ||
+                  !turnState ||
+                  scoreState == 0 ||
+                  opponentScoreState == 0
+                }
+              >
+                FIREEEEE!!!
+              </button>
+            </div>
+          ) : null}
+        </div>
+        <div>{textState}</div>
       </div>
-      <div>{textState}</div>
-
-      <div>{JSON.stringify(boardHashesState)}</div>
-      <div>{JSON.stringify(movesState)}</div>
-      <div>{JSON.stringify(answersState)}</div>
+      <div
+        id="console"
+        style={{
+          display: "inline-block",
+          width: "20%",
+          height: "100%",
+          backgroundColor: "black",
+          position: "fixed",
+          top: 0,
+          right: 0,
+          padding: 20,
+          fontFamily: "Courier New",
+        }}
+      >
+        <div>{JSON.stringify(boardHashesState)}</div>
+        <div>{JSON.stringify(movesState)}</div>
+        <div>{JSON.stringify(answersState)}</div>
+      </div>
     </div>
   );
 }
