@@ -28,6 +28,12 @@ app.get("/", (req, res) => {
 app.post("/post-board-hash/:userid", function (req, res) {
   try {
     let player = req.params.userid;
+    for (boardhash of boardhashes) {
+      if (boardhash.player == player) {
+        res.send({ success: false });
+        return;
+      }
+    }
     boardhashes.push({
       player: player,
       boardhash: req.body.boardhash,
@@ -37,7 +43,7 @@ app.post("/post-board-hash/:userid", function (req, res) {
     res.send({ success: true });
   } catch (e) {
     console.log(e);
-    res.send({ success: false });
+    res.status(500).send({ success: false });
   }
 });
 

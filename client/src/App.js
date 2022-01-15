@@ -69,13 +69,22 @@ export function App() {
             })
               .then((response) => {
                 //   console.log(response.status);
-                if (response.status == 200) {
-                  setSelfBoardHash(boardHashProof.boardhash);
-                  setTextState("Board sent successfully");
-                } else {
-                  setBoardSent(false);
-                  setTextState("Sending board failed");
-                }
+                response.json().then((data) => {
+                  if (response.status == 200) {
+                    if (data.success == false) {
+                      setBoardSent(false);
+                      setTextState(
+                        "This username is already in usage, choose another one"
+                      );
+                    } else {
+                      setSelfBoardHash(boardHashProof.boardhash);
+                      setTextState("Board sent successfully");
+                    }
+                  } else {
+                    setBoardSent(false);
+                    setTextState("Sending board failed");
+                  }
+                });
               })
               .catch((error) => {
                 console.log(error);
@@ -309,6 +318,10 @@ export function App() {
   };
 
   const verifyOpponentBoard = () => {
+    if (opponentIdState == playerIdState) {
+      setTextState("You can't be your own opponent");
+      return;
+    }
     setTextState("Verifying opponent's board...");
     for (boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
