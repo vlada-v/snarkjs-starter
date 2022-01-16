@@ -70,7 +70,7 @@ export function Ship(props) {
         borderColor: "rgb(148, 45, 14)",
         borderStyle: "solid",
         borderWidth: "2px",
-        borderRadius: "15px",
+        borderRadius: "3px",
         backgroundColor: "orangered",
         margin: 4,
       }}

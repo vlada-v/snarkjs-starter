@@ -64,7 +64,7 @@ export function App() {
   const [shipCountState, setShipCountState] = useState(7);
   const [opponentShipCountState, setOpponentShipCountState] = useState(7);
 
-  const url = "http://localhost:3000";
+  const url = "http://165.232.138.167";
 
   const sendBoard = () => {
     if (playerIdState == "") {
