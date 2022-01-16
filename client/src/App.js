@@ -40,23 +40,23 @@ export function App() {
 
   const [consoleText, setConsoleText] = useState([
     "> Welcome to ZK-Battleship!",
-    <br />,
+    "\n",
     "> This game is an example of a partial knowledge game, which doesn't allow cheating without any information leakage and need of hiding data at some external server.",
-    <br />,
+    "\n",
     "> It uses Zero-Knowledge proofs to ensure fairness of the players without revealing the actual positioning of the ships.",
-    <br />,
+    "\n",
     "> Zero knowledge proofs are represented with a hash at the end of the shot or response.",
-    <br />,
+    "\n",
     "> ",
-    <br />,
+    "\n",
     "> ",
-    <br />,
+    "\n",
     "> To start the game choose your player ID, your opponent's player ID, and position your ships on the board.",
-    <br />,
+    "\n",
     "> Select your ships by clicking on the cells where you would like to position your ships.",
-    <br />,
+    "\n",
     "> When you are done, send your board hash to lock your ship positioning without revealing it.",
-    <br />,
+    "\n",
     "> ",
   ]);
 
@@ -77,9 +77,9 @@ export function App() {
     Circuit.proveBoardHash(boardState, boardSaltState).then(
       (boardHashProof) => {
         verifyBoardProof(boardHashProof).then((res) => {
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push("> ");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           if (res == false) {
             setBoardSent(false);
             setTextState("Your board is illegal");
@@ -92,7 +92,7 @@ export function App() {
             consoleText.push(
               "> Sending your board for your opponent to verify..."
             );
-            consoleText.push(<br />);
+            consoleText.push("\n");
             consoleText.push("> " + JSON.stringify(boardHashProof));
             setConsoleText(consoleText);
             fetch(url + "/post-board-hash/" + playerIdState, {
@@ -111,14 +111,14 @@ export function App() {
                       setTextState(
                         "This username is already in usage, choose another one"
                       );
-                      consoleText.push(<br />);
+                      consoleText.push("\n");
                       consoleText.push(
                         "> This username is already in usage, choose another one and resend"
                       );
                       setConsoleText(consoleText);
                     } else {
                       setSelfBoardHash(boardHashProof.boardhash);
-                      consoleText.push(<br />);
+                      consoleText.push("\n");
                       consoleText.push(
                         "> Board sent successfully! Verify the validity of opponent's board"
                       );
@@ -127,7 +127,7 @@ export function App() {
                     }
                   } else {
                     setBoardSent(false);
-                    consoleText.push(<br />);
+                    consoleText.push("\n");
                     consoleText.push("> Sending board failed :((( Try again");
                     setConsoleText(consoleText);
                     setTextState("Sending board failed");
@@ -137,7 +137,7 @@ export function App() {
               .catch((error) => {
                 console.log(error);
                 setBoardSent(false);
-                consoleText.push(<br />);
+                consoleText.push("\n");
                 consoleText.push("> Sending board failed :((( Try again");
                 setConsoleText(consoleText);
                 setTextState("Sending board failed");
@@ -169,9 +169,9 @@ export function App() {
               setTextState("Answer sent successfully: miss");
               setConsoleText([
                 "> Answering query...",
-                <br />,
+                "\n",
                 "> Answer sent successfully: miss, for field #" + fieldId,
-                <br />,
+                "\n",
                 "> Proof: " + JSON.stringify(proofValue.proof),
               ]);
             } else {
@@ -181,12 +181,12 @@ export function App() {
               );
               setConsoleText([
                 "> Answering query...",
-                <br />,
+                "\n",
                 "> Answer sent successfully: " +
                   (proof.value == 1 ? "hit" : "ship sunk") +
                   ", for field #" +
                   fieldId,
-                <br />,
+                "\n",
                 "> Proof: " + JSON.stringify(proofValue.proof),
               ]);
             }
@@ -265,7 +265,7 @@ export function App() {
           console.log(error);
           setTurnState(true);
           setTextState("Sending move failed");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push("> Sending move failed :((( Try again!");
           setConsoleText(consoleText);
         });
@@ -323,7 +323,7 @@ export function App() {
         opponentBoardState[currAnswer.field] == null
       ) {
         setTextState("Verifying answer of opponent...");
-        consoleText.push(<br />);
+        consoleText.push("\n");
         consoleText.push("> Verifying answer of opponent...");
         setConsoleText(consoleText);
         promises.push([
@@ -369,16 +369,16 @@ export function App() {
           }
 
           setTextState("Opponent's answer verified to be legal");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push("> Opponent's answer verified to be legal");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push("> Proof: " + JSON.stringify(currAnswer.proof));
           setConsoleText(consoleText);
         } else {
           setTextState("Opponent's answer is illegal");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push("> Opponent's answer is illegal");
-          consoleText.push(<br />);
+          consoleText.push("\n");
           consoleText.push(
             "> Proof (failed): " + JSON.stringify(currAnswer.proof)
           );
@@ -402,19 +402,19 @@ export function App() {
         if (shipCountState == 0 || opponentShipCountState == 0) {
           setConsoleText([
             "> Thank you for playing ZK-Battleship!",
-            <br />,
+            "\n",
             "> This game is built in a manner, that you never revealed your board to your opponent, other than when they made a shot",
-            <br />,
+            "\n",
             "> However, Zero-Knowledge proofs confirmed at every step legality of the board setup, and the answer that was sent from your side.",
-            <br />,
+            "\n",
             "> Zero knowledge proof was represented with a hash at the end of the shot or response.",
-            <br />,
+            "\n",
             "> This game is an example of a partial knowledge game, which doesn't allow cheating without any information leakage and need of hiding data at some external server.",
-            <br />,
+            "\n",
             "> We hope you liked it and appreciate your feedback.",
-            <br />,
+            "\n",
             "> ",
-            <br />,
+            "\n",
             "> ZK-Battleship team @ Hacklodge 2022: Vlada and Balázs.",
           ]);
         }
@@ -427,13 +427,13 @@ export function App() {
   const verifyOpponentBoard = () => {
     if (opponentIdState == playerIdState) {
       setTextState("You can't be your own opponent");
-      consoleText.push(<br />);
+      consoleText.push("\n");
       consoleText.push("> You can't be your own opponent");
       setConsoleText(consoleText);
       return;
     }
     setTextState("Verifying opponent's board...");
-    consoleText.push(<br />);
+    consoleText.push("\n");
     consoleText.push("> Verifying opponent's board...");
     for (boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
@@ -442,9 +442,9 @@ export function App() {
           if (res) {
             setOpponentBoardHash(boardProof.boardhash);
             setTextState("Opponent's board verified to be legal");
-            consoleText.push(<br />);
+            consoleText.push("\n");
             consoleText.push("> " + JSON.stringify(boardProof));
-            consoleText.push(<br />);
+            consoleText.push("\n");
             consoleText.push("> Opponent's board verified to be legal");
             setConsoleText(consoleText);
             setConsoleText([
@@ -452,9 +452,9 @@ export function App() {
             ]);
           } else {
             setTextState("Opponent's board is illegal");
-            consoleText.push(<br />);
+            consoleText.push("\n");
             consoleText.push("> " + JSON.stringify(boardProof));
-            consoleText.push(<br />);
+            consoleText.push("\n");
             consoleText.push("> Opponent's board is illegal");
             setConsoleText(consoleText);
           }
@@ -463,7 +463,7 @@ export function App() {
       }
     }
     setTextState("Opponent's board not found");
-    consoleText.push(<br />);
+    consoleText.push("\n");
     consoleText.push("> Opponent's board not found");
     setConsoleText(consoleText);
   };
@@ -641,7 +641,7 @@ export function App() {
             overflowWrap: "anywhere",
           }}
         >
-          {consoleText}
+          {consoleText.map((item, i) => (item == "\n" ? <br key={i} /> : item))}
         </div>
         {/* <div>{JSON.stringify(boardHashesState)}</div>
         <div>{JSON.stringify(movesState)}</div>
