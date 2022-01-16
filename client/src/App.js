@@ -177,13 +177,13 @@ export function App() {
             } else {
               setTextState(
                 "Answer sent successfully: " +
-                  (proof.value == 1 ? "hit" : "ship sunk")
+                  (proofValue.value == 1 ? "hit" : "ship sunk")
               );
               setConsoleText([
                 "> Answering query...",
                 "\n",
                 "> Answer sent successfully: " +
-                  (proof.value == 1 ? "hit" : "ship sunk") +
+                  (proofValue.value == 1 ? "hit" : "ship sunk") +
                   ", for field #" +
                   fieldId,
                 "\n",
@@ -221,10 +221,12 @@ export function App() {
               setBoardState(newBoard);
             }
           } else {
+            console.log("a", response);
             setTextState("Sending answer failed");
           }
         })
         .catch((error) => {
+          console.log("b", error);
           setTextState("Sending answer failed");
         });
     });
