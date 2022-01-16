@@ -40,13 +40,23 @@ export function App() {
   const [consoleText, setConsoleText] = useState([
     "> Welcome to ZK-Battleship!",
     <br />,
-    "> This game uses Zero-Knowledge proofs to ensure fairness of the players without revealing the actual positioning of the ships.",
+    "> This game is an example of a partial knowledge game, which doesn't allow cheating without any information leakage and need of hiding data at some external server.",
+    <br />,
+    "> It uses Zero-Knowledge proofs to ensure fairness of the players without revealing the actual positioning of the ships.",
+    <br />,
+    "> Zero knowledge proofs are represented with a hash at the end of the shot or response.",
+    <br />,
+    "> ",
+    <br />,
+    "> ",
     <br />,
     "> To start the game choose your player ID, your opponent's player ID, and position your ships on the board.",
     <br />,
     "> Select your ships by clicking on the cells where you would like to position your ships.",
     <br />,
     "> When you are done, send your board hash to lock your ship positioning without revealing it.",
+    <br />,
+    "> ",
   ]);
 
   const [turnState, setTurnState] = useState(null);
@@ -382,6 +392,25 @@ export function App() {
         setBoardHashesState(data.boardhashes);
         setMovesState(data.moves);
         setAnswersState(data.answers);
+        if (shipCountState == 0 || opponentShipCountState == 0) {
+          setConsoleText([
+            "> Thank you for playing ZK-Battleship!",
+            <br />,
+            "> This game is built in a manner, that you never revealed your board to your opponent, other than when they made a shot",
+            <br />,
+            "> However, Zero-Knowledge proofs confirmed at every step legality of the board setup, and the answer that was sent from your side.",
+            <br />,
+            "> Zero knowledge proof was represented with a hash at the end of the shot or response.",
+            <br />,
+            "> This game is an example of a partial knowledge game, which doesn't allow cheating without any information leakage and need of hiding data at some external server.",
+            <br />,
+            "> We hope you liked it and appreciate your feedback.",
+            <br />,
+            "> ",
+            <br />,
+            "> ZK-Battleship team @ Hacklodge 2022: Vlada and Balázs.",
+          ]);
+        }
       })
       .catch((error) => {
         console.log({ error: error });
