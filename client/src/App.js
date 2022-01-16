@@ -64,7 +64,7 @@ export function App() {
   const [shipCountState, setShipCountState] = useState(7);
   const [opponentShipCountState, setOpponentShipCountState] = useState(7);
 
-  const url = "http://zk.glibert.io";
+  const url = "https://zk.glibert.io";
 
   const sendBoard = () => {
     if (playerIdState == "") {
@@ -231,7 +231,7 @@ export function App() {
   };
 
   const processQueries = () => {
-    for (query of movesState) {
+    for (var query of movesState) {
       if (
         query.player == playerIdState &&
         !answeredFieldsState[query.field] &&
@@ -282,7 +282,7 @@ export function App() {
       .then((data) => {
         setTextState("Updated successfully");
         const board = new Array(210).fill(null);
-        for (let i = 0; i < data.answers.length; i++) {
+        for (var i = 0; i < data.answers.length; i++) {
           board[data.answers[i].field] = data.answers[i].answer;
         }
         setOpponentBoardState(board);
@@ -314,7 +314,7 @@ export function App() {
   const processAnswers = async () => {
     const newOpponentBoard = opponentBoardState.slice();
     const promises = [];
-    for (answer of answersState) {
+    for (var answer of answersState) {
       let currAnswer = answer;
       // console.log(currAnswer, opponentIdState);
       if (
@@ -334,7 +334,7 @@ export function App() {
     }
 
     Promise.all(promises).then((results) => {
-      for ([currAnswer, res] of results) {
+      for (var [currAnswer, res] of results) {
         // console.log(currAnswer, res);
         if (res) {
           newOpponentBoard[currAnswer.field] = currAnswer.answer;
@@ -435,7 +435,7 @@ export function App() {
     setTextState("Verifying opponent's board...");
     consoleText.push("\n");
     consoleText.push("> Verifying opponent's board...");
-    for (boardProof of boardHashesState) {
+    for (let boardProof of boardHashesState) {
       if (boardProof.player == opponentIdState) {
         let proofValidity = verifyBoardProof(boardProof);
         proofValidity.then((res) => {
