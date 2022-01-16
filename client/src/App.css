@@ -29,6 +29,7 @@ h1 {
   font-family: "Courier New", Courier, monospace;
   font-weight: lighter;
   font-size: 60px;
+  margin: 16px;
   text-shadow: 2px 2px black;
 }
 
@@ -58,14 +59,17 @@ p {
 }
 
 #board {
-  margin-top: 30px;
+  margin-top: 16px;
 }
 
 #players {
   display: "inline-block";
   align-items: center;
   justify-content: space-around;
-  margin: 50px;
+  margin-top: 16px;
+  margin-left: 32px;
+  margin-right: 32px;
+  margin-bottom: 8px;
 }
 
 #game {

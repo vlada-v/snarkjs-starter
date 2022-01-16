@@ -36,6 +36,7 @@ export function App() {
   const [movesState, setMovesState] = useState([]);
   const [answersState, setAnswersState] = useState([]);
   const [chosenShot, setChosenShot] = useState(null);
+  const [gameStarted, setGameStarted] = useState(false);
 
   const [consoleText, setConsoleText] = useState([
     "> Welcome to ZK-Battleship!",
@@ -174,11 +175,17 @@ export function App() {
                 "> Proof: " + JSON.stringify(proofValue.proof),
               ]);
             } else {
-              setTextState("Answer sent successfully: hit");
+              setTextState(
+                "Answer sent successfully: " +
+                  (proof.value == 1 ? "hit" : "ship sunk")
+              );
               setConsoleText([
                 "> Answering query...",
                 <br />,
-                "> Answer sent successfully: hit, for field #" + fieldId,
+                "> Answer sent successfully: " +
+                  (proof.value == 1 ? "hit" : "ship sunk") +
+                  ", for field #" +
+                  fieldId,
                 <br />,
                 "> Proof: " + JSON.stringify(proofValue.proof),
               ]);
@@ -462,7 +469,8 @@ export function App() {
   };
 
   const calculateStartingPlayer = () => {
-    if (opponentBoardHash != 0 && selfBoardHash != 0 && turnState == null) {
+    if (opponentBoardHash != 0 && selfBoardHash != 0 && !gameStarted) {
+      setGameStarted(true);
       let sum = parseInt(selfBoardHash) + parseInt(opponentBoardHash);
       if (sum % 2 == 1) {
         setTurnState(parseInt(selfBoardHash) < parseInt(opponentBoardHash));
@@ -508,7 +516,7 @@ export function App() {
             />
           </div>
         ) : null}
-        {opponentBoardHash == 0 ? (
+        {opponentBoardHash == 0 && boardSent ? (
           <div>
             <h3>Choose your fighter! </h3>
             <input
@@ -526,8 +534,12 @@ export function App() {
         {opponentShipCountState == 0 ? (
           <h1 id="result">{playerIdState}, you won!!!</h1>
         ) : null}
-        <h3 hidden={turnState == null}>
-          It's your {turnState ? "" : "opponent's "} turn
+        <h3 hidden={!gameStarted}>
+          {turnState == null
+            ? "Processing..."
+            : turnState
+            ? "It's your turn"
+            : "It's your opponent's turn"}
         </h3>
         {!boardSent ? (
           <div>
@@ -536,9 +548,7 @@ export function App() {
               reference):
             </h4>
             <div id="ships">
-              <Ship size={5} />
-              <br></br>
-              <Ship size={4} />
+              <Ship size={5} /> <Ship size={4} />
               <br></br>
               <Ship size={3} /> <Ship size={3} />
               <br></br>
@@ -548,8 +558,8 @@ export function App() {
         ) : null}
         <div id="game" style={{ display: "flex", justifyContent: "center" }}>
           <div id="players">
-            <h2>{playerIdState}</h2>
-            <h2>Remaining ships: {shipCountState}</h2>
+            <h2 hidden={!gameStarted}>{playerIdState}</h2>
+            <h2 hidden={!gameStarted}>Remaining ships: {shipCountState}</h2>
             <div id="board">
               <Board
                 boardState={boardState}
@@ -573,8 +583,12 @@ export function App() {
           </div>
           {opponentBoardHash != 0 ? (
             <div id="players">
-              {opponentBoardHash != 0 ? <h2>{opponentIdState}</h2> : null}
-              <h2>Remaining ships: {opponentShipCountState}</h2>
+              {opponentBoardHash != 0 ? (
+                <h2 hidden={!gameStarted}>{opponentIdState}</h2>
+              ) : null}
+              <h2 hidden={!gameStarted}>
+                Remaining ships: {opponentShipCountState}
+              </h2>
               <div id="board">
                 <Board
                   boardState={opponentBoardState}
